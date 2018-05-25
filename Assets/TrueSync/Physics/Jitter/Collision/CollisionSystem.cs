@@ -386,17 +386,18 @@ namespace TrueSync.Physics3D {
                         CapsuleSpherePair.pool.GiveBack(capsuleSpherePair);
                         break;
                     case ShapeType.Box | ShapeType.Box:
-                        //BoxBoxPair boxBoxPair = BoxBoxPair.pool.GetNew();
-                        //boxBoxPair.Shape1 = body1.Shape;
-                        //boxBoxPair.Shape2 = body2.Shape;
+                        BoxBoxPair boxBoxPair = BoxBoxPair.pool.GetNew();
+                        boxBoxPair.Shape1 = body1.Shape;
+                        boxBoxPair.Shape2 = body2.Shape;
 
-                        //if (boxBoxPair.IsColliding(ref body1.orientation, ref body2.orientation, ref body1.position, ref body2.position,
-                        //    out point, out point1, out point2, out normal, out penetration))
-                        //{
-                        //    RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
-                        //}
-                        //BoxBoxPair.pool.GiveBack(boxBoxPair);
-                        //break;
+                        if (boxBoxPair.IsColliding(ref body1.orientation, ref body2.orientation, ref body1.position, ref body2.position,
+                            out point, out point1, out point2, out normal, out penetration))
+                        {
+                            FindSupportPoints(body1, body2, body1.Shape, body2.Shape, ref point, ref normal, out point1, out point2);
+                            RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
+                        }
+                        BoxBoxPair.pool.GiveBack(boxBoxPair);
+                        break;
                     default:
                         if (XenoCollide.Detect(body1.Shape, body2.Shape, ref body1.orientation,
                             ref body2.orientation, ref body1.position, ref body2.position,
