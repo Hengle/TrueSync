@@ -6,8 +6,10 @@ namespace TrueSync.Physics3D
     /// <summary>
     /// Represents a line segment as defined by two distinct endpoints.
     /// </summary>
-    public class SegmentShape : Shape
+    public class SegmentShape : Shape, ResourcePoolItem
     {
+        public static ResourcePool<SegmentShape> Pool = new ResourcePool<SegmentShape>();
+
         public TSVector P1;
         public TSVector P2;
 
@@ -221,6 +223,11 @@ namespace TrueSync.Physics3D
         public override void SupportMapping(ref TSVector direction, out TSVector result)
         {
             result = TSVector.up; //TODO:
+        }
+
+        public void CleanUp()
+        {
+            //TODO:
         }
     }
 }

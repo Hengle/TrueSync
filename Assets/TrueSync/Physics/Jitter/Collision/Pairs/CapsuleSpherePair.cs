@@ -45,13 +45,17 @@ namespace TrueSync.Physics3D
             ref SphereShape sphere, ref TSVector sphereCenter,
             ref TSVector pa, ref TSVector pb, ref TSVector normal, ref FP penetration)
         {
-            SegmentShape cap = new SegmentShape(p1, p2);
+            SegmentShape cap = SegmentShape.Pool.GetNew();
+            cap.P1 = p1;
+            cap.P2 = p2;
             TSVector v;
             FP r2 = capsule.Radius + sphere.Radius;
             r2 *= r2;
 
             FP sb;
             cap.ClosestPointTo(ref sphereCenter, out sb, out pb);
+            SegmentShape.Pool.GiveBack(cap);
+
             TSVector.Subtract(ref sphereCenter, ref pb, out normal);
             if (normal.sqrMagnitude - r2 >= TSMath.Epsilon)
                 return false;
@@ -64,7 +68,6 @@ namespace TrueSync.Physics3D
             TSVector.Add(ref pb, ref v, out pb);
 
             TSVector.Negate(ref normal, out normal);
-
             return true;
         }
 
