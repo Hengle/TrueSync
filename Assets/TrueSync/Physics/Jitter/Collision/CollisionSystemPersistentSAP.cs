@@ -347,7 +347,7 @@ namespace TrueSync.Physics3D {
             addCounter++;
         }
 
-        public Stack<OverlapPair> deprecated = new Stack<OverlapPair>();
+        private Stack<OverlapPair> deprecated = new Stack<OverlapPair>();
         public override bool RemoveEntity(IBroadphaseEntity body)
         {
             int count;
@@ -446,6 +446,7 @@ namespace TrueSync.Physics3D {
                     Detect(key.Entity1, key.Entity2);
                 }
             }
+
         }
 
         private void SortCallback(object obj)
