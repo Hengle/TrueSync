@@ -132,13 +132,6 @@ namespace TrueSync.Physics3D {
         }
         #endregion
 
-        private void DetectCallback(object obj)
-        {
-            BroadphasePair pair = obj as BroadphasePair;
-            base.Detect(pair.Entity1, pair.Entity2);
-            BroadphasePair.Pool.GiveBack(pair);
-        }
-
         private int Compare(IBroadphaseEntity body1, IBroadphaseEntity body2)
         {
             FP f = body1.BoundingBox.min.x - body2.BoundingBox.min.x;

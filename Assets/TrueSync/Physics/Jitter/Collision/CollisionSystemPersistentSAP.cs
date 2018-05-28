@@ -434,13 +434,6 @@ namespace TrueSync.Physics3D {
             SortAxis(obj as List<SweepPoint>);
         }
 
-        private void DetectCallback(object obj)
-        {
-            BroadphasePair pair = obj as BroadphasePair;
-            base.Detect(pair.Entity1, pair.Entity2);
-            BroadphasePair.Pool.GiveBack(pair);
-        }
-
         // okay, people often say raycasting can be made faster using the sweep
         // and prune data. (sorted axis lists). That's only partly correct,
         // the method commented out below uses the non-uniform voxelgrid

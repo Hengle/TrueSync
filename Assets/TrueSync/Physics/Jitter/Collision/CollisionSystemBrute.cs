@@ -92,13 +92,6 @@ namespace TrueSync.Physics3D {
         }
         #endregion
 
-        private void DetectCallback(object obj)
-        {
-            BroadphasePair pair = obj as BroadphasePair;
-            base.Detect(pair.Entity1, pair.Entity2);
-            BroadphasePair.Pool.GiveBack(pair);
-        }
-
         /// <summary>
         /// Sends a ray (definied by start and direction) through the scene (all bodies added).
         /// NOTE: For performance reasons terrain and trianglemeshshape aren't checked
