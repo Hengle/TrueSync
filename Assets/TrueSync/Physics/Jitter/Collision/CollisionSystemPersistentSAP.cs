@@ -62,18 +62,10 @@ namespace TrueSync.Physics3D {
 	#endregion
 
 	#region private struct OverlapPair
-	public class OverlapPair : IComparable, ResourcePoolItem
+	public struct OverlapPair : IComparable, ResourcePoolItem
     {
 		// internal values for faster access within the engine
 		public IBroadphaseEntity Entity1, Entity2;
-
-        public static ResourcePool<OverlapPair> Pool = new ResourcePool<OverlapPair>();
-
-        public OverlapPair()
-        {
-            this.Entity1 = null;
-            this.Entity2 = null;
-        }
 
         /// <summary>
         /// Initializes a new instance of the BodyPair class.
@@ -264,8 +256,7 @@ namespace TrueSync.Physics3D {
                     {
                         if (CheckBoundingBoxes(body,keyelement.Body))
                         {
-                            //fullOverlaps.Add(new OverlapPair(body, keyelement.Body));
-                            OverlapPair pair = OverlapPair.Pool.GetNew();
+                            OverlapPair pair;
                             pair.Entity1 = body;
                             pair.Entity2 = keyelement.Body;
                             fullOverlaps.Add(pair);
@@ -303,8 +294,7 @@ namespace TrueSync.Physics3D {
                         {
                             lock (fullOverlaps)
                             {
-                                //fullOverlaps.Add(new OverlapPair(swapper.Body, keyelement.Body));
-                                OverlapPair pair = OverlapPair.Pool.GetNew();
+                                OverlapPair pair;
                                 pair.Entity1 = swapper.Body;
                                 pair.Entity2 = keyelement.Body;
                                 fullOverlaps.Add(pair);
@@ -316,8 +306,7 @@ namespace TrueSync.Physics3D {
                     {
                         lock (fullOverlaps)
                         {
-                            //fullOverlaps.Remove(new OverlapPair(swapper.Body, keyelement.Body));
-                            OverlapPair pair = OverlapPair.Pool.GetNew();
+                            OverlapPair pair;
                             pair.Entity1 = swapper.Body;
                             pair.Entity2 = keyelement.Body;
                             fullOverlaps.Remove(pair);
@@ -396,12 +385,7 @@ namespace TrueSync.Physics3D {
                 if (pair.Entity1 == body || pair.Entity2 == body)
                     deprecated.Push(pair);
             }
-            while (deprecated.Count > 0)
-            {
-                OverlapPair pair = deprecated.Pop();
-                fullOverlaps.Remove(pair);
-                OverlapPair.Pool.GiveBack(pair);
-            }
+            fullOverlaps.RemoveAll(deprecated);
 
             bodyList.Remove(body);
 
@@ -417,10 +401,6 @@ namespace TrueSync.Physics3D {
         {
             if (addCounter > AddedObjectsBruteForceIsUsed)
             {
-                for (int i = 0, length = fullOverlaps.Count; i < length; i++)
-                {
-                    OverlapPair.Pool.GiveBack(fullOverlaps[i]);
-                }
                 fullOverlaps.Clear();
 
                 DirtySortAxis(axis1);
