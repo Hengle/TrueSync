@@ -70,31 +70,28 @@ namespace TrueSync.Physics3D {
 
             Multishape multiShape;
 
-            lock (workingCloneStack)
+            if (workingCloneStack.Count == 0)
             {
-                if (workingCloneStack.Count == 0)
-                {
-                    multiShape = this.CreateWorkingClone();
-                    multiShape.workingCloneStack = this.workingCloneStack;
-                    workingCloneStack.Push(multiShape);
-                }
-                multiShape = workingCloneStack.Pop();
-                multiShape.isClone = true;
+                multiShape = this.CreateWorkingClone();
+                multiShape.workingCloneStack = this.workingCloneStack;
+                workingCloneStack.Push(multiShape);
             }
+            multiShape = workingCloneStack.Pop();
+            multiShape.isClone = true;
 
             return multiShape;
         }
 
         public override void UpdateShape()
         {
-            lock(workingCloneStack) workingCloneStack.Clear();
+            workingCloneStack.Clear();
             base.UpdateShape();
         }
 
         public void ReturnWorkingClone()
         {
             Debug.Assert(this.isClone, "Only clones can be returned!");
-            lock (workingCloneStack) { workingCloneStack.Push(this); }
+            workingCloneStack.Push(this);
         }
 
         /// <summary>

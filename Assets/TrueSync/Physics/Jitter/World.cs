@@ -664,7 +664,7 @@ namespace TrueSync.Physics3D
         {
             if (arbiter.contactList.Count == 0)
             {
-                lock (removedArbiterStack) { removedArbiterStack.Push(arbiter); }
+                removedArbiterStack.Push(arbiter);
                 return;
             }
 
@@ -933,17 +933,16 @@ namespace TrueSync.Physics3D
 
             bool arbiterCreated = false;
 
-            lock (selectedArbiterMap) {
-                selectedArbiterMap.LookUpArbiter(body1, body2, out arbiter);
-                if (arbiter == null) {
-                    arbiter = Arbiter.Pool.GetNew();
-                    arbiter.body1 = body1; arbiter.body2 = body2;
-                    selectedArbiterMap.lookUpKey.body1 = body1;
-                    selectedArbiterMap.lookUpKey.body2 = body2;
-                    selectedArbiterMap.Add(selectedArbiterMap.lookUpKey.GetHashCode(), arbiter);
+            selectedArbiterMap.LookUpArbiter(body1, body2, out arbiter);
+            if (arbiter == null)
+            {
+                arbiter = Arbiter.Pool.GetNew();
+                arbiter.body1 = body1; arbiter.body2 = body2;
+                selectedArbiterMap.lookUpKey.body1 = body1;
+                selectedArbiterMap.lookUpKey.body2 = body2;
+                selectedArbiterMap.Add(selectedArbiterMap.lookUpKey.GetHashCode(), arbiter);
 
-                    arbiterCreated = true;
-                }
+                arbiterCreated = true;
             }
 
             Contact contact = null;

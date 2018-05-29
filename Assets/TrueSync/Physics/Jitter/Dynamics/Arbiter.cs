@@ -191,29 +191,26 @@ namespace TrueSync.Physics3D {
 
             int index;
 
-            lock (contactList)
+            if (this.contactList.Count == 4)
             {
-                if (this.contactList.Count == 4)
-                {
-                    index = SortCachedPoints(ref relPos1, penetration);
-                    ReplaceContact(ref point1, ref point2, ref normal, penetration, index, contactSettings);
-                    return null;
-                }
+                index = SortCachedPoints(ref relPos1, penetration);
+                ReplaceContact(ref point1, ref point2, ref normal, penetration, index, contactSettings);
+                return null;
+            }
 
-                index = GetCacheEntry(ref relPos1, contactSettings.breakThreshold);
+            index = GetCacheEntry(ref relPos1, contactSettings.breakThreshold);
 
-                if (index >= 0)
-                {
-                    ReplaceContact(ref point1, ref point2, ref normal, penetration, index, contactSettings);
-                    return null;
-                }
-                else
-                {
-                    Contact contact = Contact.Pool.GetNew();
-                    contact.Initialize(body1, body2, ref point1, ref point2, ref normal, penetration, true, contactSettings);
-                    contactList.Add(contact);
-                    return contact;
-                }
+            if (index >= 0)
+            {
+                ReplaceContact(ref point1, ref point2, ref normal, penetration, index, contactSettings);
+                return null;
+            }
+            else
+            {
+                Contact contact = Contact.Pool.GetNew();
+                contact.Initialize(body1, body2, ref point1, ref point2, ref normal, penetration, true, contactSettings);
+                contactList.Add(contact);
+                return contact;
             }
         }
 

@@ -292,25 +292,19 @@ namespace TrueSync.Physics3D {
                     {
                         if (CheckBoundingBoxes(swapper.Body, keyelement.Body))
                         {
-                            lock (fullOverlaps)
-                            {
-                                OverlapPair pair;
-                                pair.Entity1 = swapper.Body;
-                                pair.Entity2 = keyelement.Body;
-                                fullOverlaps.Add(pair);
-                            }
+                            OverlapPair pair;
+                            pair.Entity1 = swapper.Body;
+                            pair.Entity2 = keyelement.Body;
+                            fullOverlaps.Add(pair);
                         }
                     }
 
                     if (!keyelement.Begin && swapper.Begin)
                     {
-                        lock (fullOverlaps)
-                        {
-                            OverlapPair pair;
-                            pair.Entity1 = swapper.Body;
-                            pair.Entity2 = keyelement.Body;
-                            fullOverlaps.Remove(pair);
-                        }
+                        OverlapPair pair;
+                        pair.Entity1 = swapper.Body;
+                        pair.Entity2 = keyelement.Body;
+                        fullOverlaps.Remove(pair);
                     }
 
                     axis[i + 1] = swapper;
