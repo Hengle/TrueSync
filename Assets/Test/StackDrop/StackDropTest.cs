@@ -30,6 +30,9 @@ public class StackDropTest : TrueSyncBehaviour
 
     private HashList<GameObject> objStack = new HashList<GameObject>();
 
+    [SerializeField]
+    private TSVector offset = TSVector.zero;
+
     private int frame = 0;
 
     public override void OnSyncedStart()
@@ -40,10 +43,10 @@ public class StackDropTest : TrueSyncBehaviour
             {
                 for (int k = 0; k < zSize; k++)
                 {
-                    GameObject tObj = TrueSyncManager.SyncedInstantiate((i+j+k)%2 == 0? sphere : capsule, new TSVector(
-                        (i - 1) * (boxWidth + xGap),
-                        (j - 1) * (boxWidth + yGap),
-                        (k - 1) * (boxWidth + zGap)), TSQuaternion.AngleAxis(0, TSVector.forward));
+                    GameObject tObj = TrueSyncManager.SyncedInstantiate((i+j+k)%2 == 0? sphere : sphere, new TSVector(
+                        (i - 1) * (boxWidth + xGap) + offset.x,
+                        (j - 1) * (boxWidth + yGap) + offset.y,
+                        (k - 1) * (boxWidth + zGap) + offset.z), TSQuaternion.AngleAxis(0, TSVector.forward));
                     TSMaterial tMaterial = tObj.AddComponent<TSMaterial>();
                     tMaterial.restitution = 0;
                     tMaterial.friction = 1;
