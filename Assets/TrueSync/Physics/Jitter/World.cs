@@ -850,8 +850,8 @@ namespace TrueSync.Physics3D
                 {
                     // use Taylor's expansions of sync function
                     // axis = body.angularVelocity * (FP.Half * timestep - (timestep * timestep * timestep) * (0.020833333333f) * angle * angle);
-                    //TSVector.Multiply(ref body.angularVelocity, (halfTimeStep - (timestep * timestep * timestep) * (2082 * FP.EN6) * angle * angle), out axis);
-                    TSVector.Multiply(ref body.angularVelocity, halfTimeStep, out axis);
+                    TSVector.Multiply(ref body.angularVelocity, (halfTimeStep - (timestep * timestep * timestep) * (2082 * FP.EN6) * angle * angle), out axis);
+                    //TSVector.Multiply(ref body.angularVelocity, halfTimeStep, out axis);
                 }
                 else
                 {
