@@ -308,6 +308,7 @@ namespace TrueSync.Physics3D {
             if (!b1IsMulti && !b2IsMulti)
             {
                 TSVector point1, point2;
+                RigidBody b1, b2;
                 ShapeType type = body1.shape.shapeType | body2.shape.shapeType;
                 switch (type)
                 {
@@ -327,7 +328,6 @@ namespace TrueSync.Physics3D {
                     case ShapeType.Box | ShapeType.Sphere:
                         BoxSpherePair boxSpherePair = BoxSpherePair.pool.GetNew();
 
-                        RigidBody b1, b2;
                         if (body1.Shape is BoxShape)
                         {
                             b1 = body1;
