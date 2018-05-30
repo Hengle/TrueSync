@@ -129,6 +129,7 @@ namespace TrueSync.Physics3D
                         if (distanceSqr < contactCapsuleRadiusSqr)
                         {
                             // Yep, we're inside a capsule
+                            contactCapsuleRadiusSqr = distanceSqr;
                             hasContact = true;
                             contactPoint = nearestOnEdge;
                         }
@@ -148,9 +149,9 @@ namespace TrueSync.Physics3D
                     resultNormal = TSVector.Normalize(resultNormal);
                     point = contactPoint;
                     point1 = point;
+                    resultNormal = TSVector.Negate(resultNormal);
                     point2 = sphereCenter + resultNormal * r;
                     penetration = r - distance;
-                    resultNormal = TSVector.Negate(resultNormal);
                     return true;
                 }
 
