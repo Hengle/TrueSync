@@ -402,8 +402,6 @@ namespace TrueSync.Physics3D {
                             ref body2.orientation, ref body1.position, ref body2.position,
                             out point, out normal, out penetration))
                         {
-                            //normal = JVector.Up;
-                            //UnityEngine.Debug.Log("FINAL  --- >>> normal: " + normal);
                             FindSupportPoints(body1, body2, body1.Shape, body2.Shape, ref point, ref normal, out point1, out point2);
                             RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
                         }
@@ -431,10 +429,6 @@ namespace TrueSync.Physics3D {
                         }
                         break;
                 }
-
-
-
-                //UnityEngine.Debug.Log("-----------------------: " + normal);
             }
             else if (b1IsMulti && b2IsMulti)
             {
@@ -649,8 +643,7 @@ namespace TrueSync.Physics3D {
                     }
 
                 }
-
-                detected.Clear(); potentialTriangleLists.GiveBack(detected);
+                potentialTriangleLists.GiveBack(detected);
                 ms.ReturnWorkingClone();      
             }
             else
@@ -677,8 +670,6 @@ namespace TrueSync.Physics3D {
                             softBody.VertexBodies[minIndex], ref point, ref point, ref normal, penetration);
                     }
                 }
-
-                detected.Clear();
                 potentialTriangleLists.GiveBack(detected);
             }
         }
