@@ -7,11 +7,6 @@ namespace TrueSync.Physics3D
     {
         public static ResourcePool<BoxSpherePair> pool = new ResourcePool<BoxSpherePair>();
 
-        private static FP[] boxMin = new FP[3];
-        private static FP[] boxMax = new FP[3];
-        private static FP[] point = new FP[3];
-        private static FP[] closestPoint = new FP[3];
-
         public override bool IsColliding(ref TSMatrix orientation1, ref TSMatrix orientation2, ref TSVector position1, ref TSVector position2,
             out TSVector point, out TSVector point1, out TSVector point2, out TSVector normal, out FP penetration)
         {
@@ -40,8 +35,8 @@ namespace TrueSync.Physics3D
 
             if (dist < TSMath.Epsilon)
             {
-                point = point1;
                 penetration = -dist;
+                point = point1;
                 return true;
             }
             return false;
@@ -51,14 +46,6 @@ namespace TrueSync.Physics3D
             ref TSVector pointOnBox, ref TSVector pointOnSphere, ref TSVector normal)
         {
             TSVector boxHalfSize = box.halfSize;
-            boxMin[0] = -boxHalfSize.x;
-            boxMin[1] = -boxHalfSize.y;
-            boxMin[2] = -boxHalfSize.z;
-
-            boxMax[0] = boxHalfSize.x;
-            boxMax[1] = boxHalfSize.y;
-            boxMax[2] = boxHalfSize.z;
-
             TSVector prel;
             // convert sphere center into box local space
             TSVector.Subtract(ref sphereCenter, ref boxPosition, out prel);
@@ -66,35 +53,145 @@ namespace TrueSync.Physics3D
             TSMatrix.Inverse(ref boxOrientation, out invBoxOrientation);
             TSVector.Transform(ref prel, ref invBoxOrientation, out prel);
 
-            point[0] = prel.x;
-            point[1] = prel.y;
-            point[2] = prel.z;
-
-            for (int i = 0; i < 3; i++)
+            pointOnBox = prel;
+            bool outSide = false;
+            //x
+            if (prel.x < -boxHalfSize.x)
             {
-                FP v = point[i];
-                v = TSMath.Max(v, boxMin[i]);
-                v = TSMath.Min(v, boxMax[i]);
-                closestPoint[i] = v;
+                outSide = true;
+                pointOnBox.x = -boxHalfSize.x;
+            }
+            else if (prel.x > boxHalfSize.x)
+            {
+                outSide = true;
+                pointOnBox.x = boxHalfSize.x;
             }
 
-            pointOnBox.x = closestPoint[0];
-            pointOnBox.y = closestPoint[1];
-            pointOnBox.z = closestPoint[2];
-
-            normal = prel - pointOnBox;
-            FP sqrDist = normal.sqrMagnitude;
-            if (sqrDist < radius * radius)
+            //y
+            if (prel.y < -boxHalfSize.y)
             {
+                outSide = true;
+                pointOnBox.y = -boxHalfSize.y;
+            }
+            else if (prel.y > boxHalfSize.y)
+            {
+                outSide = true;
+                pointOnBox.y = boxHalfSize.y;
+            }
+
+            //z
+            if (prel.z < -boxHalfSize.z)
+            {
+                outSide = true;
+                pointOnBox.z = -boxHalfSize.z;
+            }
+            else if (prel.z > boxHalfSize.z)
+            {
+                outSide = true;
+                pointOnBox.z = boxHalfSize.z;
+            }
+
+            if (outSide)
+            {
+                normal = prel - pointOnBox;
+
+                FP dist2 = normal.sqrMagnitude;
+                if (dist2 > radius * radius)
+                {
+                    return FP.One;
+                }
+
+                FP distance;
+                if (dist2 <= TSMath.Epsilon)
+                {
+                    distance = -GetSpherePenetration(boxHalfSize, prel, ref pointOnBox, out normal);
+                }
+                else
+                {
+                    distance = normal.magnitude;
+                    normal /= distance;
+                }
                 // transform back in world space
                 TSVector.Transform(ref pointOnBox, ref boxOrientation, out pointOnBox);
                 TSVector.Add(ref pointOnBox, ref boxPosition, out pointOnBox);
-                normal = pointOnBox - sphereCenter;
+
+                pointOnSphere = prel - normal * radius;
+                TSVector.Transform(ref pointOnSphere, ref boxOrientation, out pointOnSphere);
+                TSVector.Add(ref pointOnSphere, ref boxPosition, out pointOnSphere);
+
+                normal = TSVector.Transform(normal, boxOrientation);
+                normal = TSVector.Negate(normal);
                 normal.Normalize();
-                pointOnSphere = sphereCenter + normal * radius;
-                return TSMath.Sqrt(sqrDist) - radius;
+
+                return distance - radius;
             }
-            return FP.One;
+            else
+            {
+                FP distance;
+                distance = -GetSpherePenetration(boxHalfSize, prel, ref pointOnBox, out normal);
+                normal = TSVector.Transform(normal, boxOrientation);
+                normal = TSVector.Negate(normal);
+                pointOnSphere = sphereCenter + normal * radius;
+                TSVector.Transform(ref pointOnBox, ref boxOrientation, out pointOnBox);
+                TSVector.Add(ref pointOnBox, ref boxPosition, out pointOnBox);
+                return distance - radius;
+            }
+        }
+
+        private FP GetSpherePenetration(TSVector boxHalfExtent, TSVector sphereRelPos, ref TSVector closestPoint, out TSVector normal)
+        {
+            //project the center of the sphere on the closest face of the box
+            FP faceDist = boxHalfExtent.x - sphereRelPos.x;
+            FP minDist = faceDist;
+            closestPoint.x = boxHalfExtent.x;
+            normal = TSVector.right;
+
+            faceDist = boxHalfExtent.x + sphereRelPos.x;
+            if (faceDist < minDist)
+            {
+                minDist = faceDist;
+                closestPoint = sphereRelPos;
+                closestPoint.x = -boxHalfExtent.x;
+                normal = TSVector.Negate(TSVector.right);
+            }
+
+            faceDist = boxHalfExtent.y - sphereRelPos.y;
+            if (faceDist < minDist)
+            {
+                minDist = faceDist;
+                closestPoint = sphereRelPos;
+                closestPoint.y = boxHalfExtent.y;
+                normal = TSVector.up;
+            }
+
+            faceDist = boxHalfExtent.y + sphereRelPos.y;
+            if (faceDist < minDist)
+            {
+                minDist = faceDist;
+                closestPoint = sphereRelPos;
+                closestPoint.y = -boxHalfExtent.y;
+                normal = TSVector.Negate(TSVector.up);
+            }
+
+            faceDist = boxHalfExtent.z - sphereRelPos.z;
+            if (faceDist < minDist)
+            {
+                minDist = faceDist;
+                closestPoint = sphereRelPos;
+                closestPoint.z = boxHalfExtent.z;
+                normal = TSVector.forward;
+            }
+
+            faceDist = boxHalfExtent.z + sphereRelPos.z;
+            if (faceDist < minDist)
+            {
+                minDist = faceDist;
+                closestPoint = sphereRelPos;
+                closestPoint.z = -boxHalfExtent.z;
+                normal = TSVector.Negate(TSVector.forward);
+            }
+
+            return minDist;
         }
     }
 }
