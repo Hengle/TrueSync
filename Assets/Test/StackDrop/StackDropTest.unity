@@ -191,7 +191,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalPosition.y
-      value: -10
+      value: -60
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalPosition.z
@@ -199,19 +199,19 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalRotation.x
-      value: 0.043577887
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalRotation.y
-      value: -0.0019026523
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalRotation.z
-      value: 0.043577887
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalRotation.w
-      value: 0.99809736
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_RootOrder
@@ -251,15 +251,23 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 112066, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 462212, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
+      propertyPath: m_LocalScale.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 11473656, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
+      propertyPath: lossyScale.y._serializedValue
+      value: 429496729600
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 435fa2cb799997c46a75eea40a87eaba, type: 2}
@@ -347,9 +355,9 @@ MonoBehaviour:
   localOwner:
     id: 0
     name: 
-  xSize: 5
-  ySize: 5
-  zSize: 5
+  xSize: 1
+  ySize: 1
+  zSize: 1
   xGap:
     _serializedValue: 429496736
   yGap:
@@ -359,6 +367,13 @@ MonoBehaviour:
   cube: {fileID: 1597555348775142, guid: b849546adf72bab419ab4ca99a794000, type: 2}
   sphere: {fileID: 1423581356432402, guid: a7831df5c07986e4589bd8453270b818, type: 2}
   capsule: {fileID: 1517319422861860, guid: 260fb5d2fe828d744a298fd9645c90b7, type: 2}
+  offset:
+    x:
+      _serializedValue: 0
+    y:
+      _serializedValue: 0
+    z:
+      _serializedValue: 0
 --- !u!4 &471511823
 Transform:
   m_ObjectHideFlags: 0

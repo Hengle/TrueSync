@@ -43,7 +43,7 @@ public class StackDropTest : TrueSyncBehaviour
             {
                 for (int k = 0; k < zSize; k++)
                 {
-                    GameObject tObj = TrueSyncManager.SyncedInstantiate((i+j+k)%2 == 0? sphere : sphere, new TSVector(
+                    GameObject tObj = TrueSyncManager.SyncedInstantiate((i+j+k)%2 == 0? sphere : cube, new TSVector(
                         (i - 1) * (boxWidth + xGap) + offset.x,
                         (j - 1) * (boxWidth + yGap) + offset.y,
                         (k - 1) * (boxWidth + zGap) + offset.z), TSQuaternion.AngleAxis(0, TSVector.forward));
@@ -74,6 +74,6 @@ public class StackDropTest : TrueSyncBehaviour
             rotationCheckSum += (rotation.x + rotation.y + rotation.z + rotation.w);
         }
 
-        //Debug.Log("frame :" + frame + " positionCheckSum: " + positionCheckSum.ToString("F8") + " rotationCheckSum: " + rotationCheckSum.ToString("F8"));
+        Debug.Log("frame :" + frame + " positionCheckSum: " + positionCheckSum.ToString("F8") + " rotationCheckSum: " + rotationCheckSum.ToString("F8"));
     }
 }
