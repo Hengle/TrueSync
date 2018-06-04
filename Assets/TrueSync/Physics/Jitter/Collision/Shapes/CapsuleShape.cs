@@ -59,14 +59,23 @@ namespace TrueSync.Physics3D {
         /// </summary>
         public override void CalculateMassInertia()
         {
-            FP massSphere = ( (4 * FP.One) / (3 * FP.One)) * TSMath.Pi * radius * radius * radius;
-            FP massCylinder = TSMath.Pi * radius * radius * length;
+            FP rr = radius * radius;
+            FP ll = length * length;
+            FP massSphere = ( (4 * FP.One) / (3 * FP.One)) * TSMath.Pi * rr * radius;
+            FP massCylinder = TSMath.Pi * rr * length;
 
             mass = massCylinder + massSphere;
 
-            this.inertia.M11 = (FP.One / (4 * FP.One)) * massCylinder * radius * radius + (FP.One / (12 * FP.One)) * massCylinder * length * length +  ((2 * FP.One) / (5 * FP.One)) * massSphere * radius * radius + (FP.One / (4 * FP.One)) * length * length * massSphere;
-            this.inertia.M22 = (FP.One / (2 * FP.One)) * massCylinder * radius * radius +  ((2 * FP.One) / (5 * FP.One)) * massSphere * radius * radius;
-            this.inertia.M33 = (FP.One / (4 * FP.One)) * massCylinder * radius * radius + (FP.One / (12 * FP.One)) * massCylinder * length * length +  ((2 * FP.One) / (5 * FP.One)) * massSphere * radius * radius + (FP.One / (4 * FP.One)) * length * length * massSphere;
+            FP massCylinderRR = massCylinder * rr;
+            FP massCylinderLL = massCylinder * ll;
+            FP massSphereRR = massSphere * rr;
+            FP massSphereLL = massSphere * ll;
+            FP quarter = (FP.One / (4 * FP.One));
+            FP twoOverFive = (2 * FP.One) / (5 * FP.One);
+
+            this.inertia.M11 = quarter * massCylinderRR + (FP.One / (12 * FP.One)) * massCylinderLL + twoOverFive * massSphereRR + quarter * massSphereLL;
+            this.inertia.M22 = FP.Half * massCylinderRR + twoOverFive * massSphereRR;
+            this.inertia.M33 = this.inertia.M11;
 
             //this.inertia.M11 = (FP.One / (4 * FP.One)) * mass * radius * radius + (FP.One / (12 * FP.One)) * mass * height * height;
             //this.inertia.M22 = (FP.One / (2 * FP.One)) * mass * radius * radius;

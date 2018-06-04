@@ -102,11 +102,15 @@ namespace TrueSync.Physics3D {
         public override void CalculateMassInertia()
         {
             mass = size.x * size.y * size.z;
+            FP xx = size.x * size.x;
+            FP yy = size.y * size.y;
+            FP zz = size.z * size.z;
+            FP massBox = mass / 12;
 
             inertia = TSMatrix.Identity;
-            inertia.M11 = (FP.One / (12 * FP.One)) * mass * (size.y * size.y + size.z * size.z);
-            inertia.M22 = (FP.One / (12 * FP.One)) * mass * (size.x * size.x + size.z * size.z);
-            inertia.M33 = (FP.One / (12 * FP.One)) * mass * (size.x * size.x + size.y * size.y);
+            inertia.M11 = massBox * (yy + zz);
+            inertia.M22 = massBox * (xx + zz);
+            inertia.M33 = massBox * (xx + yy);
 
             this.geomCen = TSVector.zero;
         }
