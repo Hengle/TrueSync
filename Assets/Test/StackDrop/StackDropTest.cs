@@ -33,6 +33,9 @@ public class StackDropTest : TrueSyncBehaviour
     [SerializeField]
     private TSVector offset = TSVector.zero;
 
+    [SerializeField]
+    private bool enableLog = false;
+
     private int frame = 0;
 
     public override void OnSyncedStart()
@@ -74,6 +77,7 @@ public class StackDropTest : TrueSyncBehaviour
             rotationCheckSum += (rotation.x + rotation.y + rotation.z + rotation.w);
         }
 
-        Debug.Log("frame :" + frame + " positionCheckSum: " + positionCheckSum.ToString("F8") + " rotationCheckSum: " + rotationCheckSum.ToString("F8"));
+        if (enableLog)
+            Debug.Log("frame :" + frame + " positionCheckSum: " + positionCheckSum.ToString("F8") + " rotationCheckSum: " + rotationCheckSum.ToString("F8"));
     }
 }
