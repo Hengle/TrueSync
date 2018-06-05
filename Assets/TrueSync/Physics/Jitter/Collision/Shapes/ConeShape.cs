@@ -68,13 +68,17 @@ namespace TrueSync.Physics3D {
         /// </summary>
         public override void CalculateMassInertia()
         {
-            mass = (FP.One / (3 * FP.One)) * TSMath.Pi * radius * radius * height;
+            FP rr = radius * radius;
+            FP hh = height * height;
+
+            //mass = (FP.One / (3 * FP.One)) * TSMath.Pi * rr * height;
+            mass = TSMath.Pi * rr * height * FP.EN1;
 
             // inertia through center of mass axis.
             inertia = TSMatrix.Identity;
-            inertia.M11 = (3 * FP.EN1 / 8) * mass * (radius * radius + 4 * height * height);
-            inertia.M22 = (3 * FP.EN1) * mass * radius * radius;
-            inertia.M33 = (3 * FP.EN1 / 8) * mass * (radius * radius + 4 * height * height);
+            inertia.M11 = (mass / 8) * (rr + 4 * hh);
+            inertia.M22 = mass * radius * radius;
+            inertia.M33 = inertia.M11;
 
             // J_x=J_y=3/20 M (R^2+4 H^2)
 

@@ -133,11 +133,14 @@ namespace TrueSync.Physics3D {
 
             TSVector size; TSVector.Subtract(ref boundingBox.max, ref boundingBox.min, out size);
 
-            mass = size.x * size.y * size.z;
+            mass = (FP.One / (12 * FP.One)) * size.x * size.y * size.z;
+            FP xx = size.x * size.x;
+            FP yy = size.y * size.y;
+            FP zz = size.z * size.z;
 
-            inertia.M11 = (FP.One / (12 * FP.One)) * mass * (size.y * size.y + size.z * size.z);
-            inertia.M22 = (FP.One / (12 * FP.One)) * mass * (size.x * size.x + size.z * size.z);
-            inertia.M33 = (FP.One / (12 * FP.One)) * mass * (size.x * size.x + size.y * size.y);
+            inertia.M11 = mass * (yy + zz);
+            inertia.M22 = mass * (xx + zz);
+            inertia.M33 = mass * (xx + yy);
         }
 
     }

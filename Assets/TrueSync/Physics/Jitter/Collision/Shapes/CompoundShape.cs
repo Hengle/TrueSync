@@ -191,18 +191,25 @@ namespace TrueSync.Physics3D {
                 TSVector p = Shapes[i].Position * -FP.One;
                 FP m = Shapes[i].Shape.Mass;
 
-                currentInertia.M11 += m * (p.y * p.y + p.z * p.z);
-                currentInertia.M22 += m * (p.x * p.x + p.z * p.z);
-                currentInertia.M33 += m * (p.x * p.x + p.y * p.y);
+                FP xx = p.x * p.x;
+                FP yy = p.y * p.y;
+                FP zz = p.z * p.z;
+                FP xym = p.x * p.y * m;
+                FP xzm = p.x * p.z * m;
+                FP yzm = p.y * p.z * m;
 
-                currentInertia.M12 += -p.x * p.y * m;
-                currentInertia.M21 += -p.x * p.y * m;
+                currentInertia.M11 += m * (yy + zz);
+                currentInertia.M22 += m * (xx + zz);
+                currentInertia.M33 += m * (xx + yy);
 
-                currentInertia.M31 += -p.x * p.z * m;
-                currentInertia.M13 += -p.x * p.z * m;
+                currentInertia.M12 += -xym;
+                currentInertia.M21 += -xym;
 
-                currentInertia.M32 += -p.y * p.z * m;
-                currentInertia.M23 += -p.y * p.z * m;
+                currentInertia.M31 += -xzm;
+                currentInertia.M13 += -xzm;
+
+                currentInertia.M32 += -yzm;
+                currentInertia.M23 += -yzm;
 
                 base.inertia += currentInertia;
                 base.mass += m;

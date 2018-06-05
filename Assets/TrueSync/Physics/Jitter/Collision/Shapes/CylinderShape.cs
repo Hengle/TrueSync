@@ -59,10 +59,13 @@ namespace TrueSync.Physics3D {
         /// </summary>
         public override void CalculateMassInertia()
         {
-            this.mass = TSMath.Pi * radius * radius * height;
-            this.inertia.M11 = (FP.One / (4 * FP.One)) * mass * radius * radius + (FP.One / (12 * FP.One)) * mass * height * height;
-            this.inertia.M22 = (FP.One / (2 * FP.One)) * mass * radius * radius;
-            this.inertia.M33 = (FP.One / (4 * FP.One)) * mass * radius * radius + (FP.One / (12 * FP.One)) * mass * height * height;
+            FP rr = radius * radius;
+            FP hh = height * height;
+            this.mass = TSMath.Pi * rr * height;
+            FP massRR = mass * rr;
+            this.inertia.M11 = FP.Half * FP.Half * massRR + (FP.One / (12 * FP.One)) * mass * hh;
+            this.inertia.M22 = FP.Half * massRR;
+            this.inertia.M33 = this.inertia.M11;
         }
 
         /// <summary>
