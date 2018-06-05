@@ -162,6 +162,8 @@ namespace TrueSync.Physics3D
         private int smallIterations = 3;
         private FP timestep = FP.Zero;
 
+        private FP maxAngularVelocity = TSMath.PiOver2 * FP.EN2;
+
         public IslandManager islands = new IslandManager();
 
 		public HashList<OverlapPairContact> initialCollisions = new HashList<OverlapPairContact>();
@@ -414,6 +416,14 @@ namespace TrueSync.Physics3D
 
             this.contactIterations = iterations;
             this.smallIterations = smallIterations;
+        }
+
+        public void SetMaxAngularVelocity(FP angularVelocity)
+        {
+            if (angularVelocity < FP.Zero)
+                angularVelocity = FP.Zero;
+
+            this.maxAngularVelocity = angularVelocity;
         }
 
         /// <summary>
@@ -807,12 +817,11 @@ namespace TrueSync.Physics3D
                         TSVector.Transform(ref temp, ref body.invInertiaWorld, out temp);
                         TSVector.Add(ref temp, ref body.angularVelocity, out body.angularVelocity);
 
-                        //clamp angular velocity to 0.5pi .
-                        FP maxAngVel = TSMath.PiOver2;
+                        //clamp angular velocity to max angular velocity.
                         FP angvel = body.angularVelocity.magnitude;
-                        if (angvel * timestep > maxAngVel)
+                        if (angvel * timestep > maxAngularVelocity)
                         {
-                            body.angularVelocity *= (maxAngVel / timestep) / angvel;
+                            body.angularVelocity *= (maxAngularVelocity / timestep) / angvel;
                         }
                     }
 
