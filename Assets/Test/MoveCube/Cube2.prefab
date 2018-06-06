@@ -25,6 +25,7 @@ GameObject:
   - component: {fileID: 114083504738804052}
   - component: {fileID: 114455159209940372}
   - component: {fileID: 114470143773980904}
+  - component: {fileID: 114155368995281494}
   m_Layer: 0
   m_Name: Cube2
   m_TagString: Untagged
@@ -116,6 +117,36 @@ MonoBehaviour:
       _serializedValue: 4294967296
   tsTransform: {fileID: 114455159209940372}
   _size: {x: 1, y: 1, z: 1}
+--- !u!114 &114155368995281494
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1912937751086272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4c7bd8f1459c9546b38fea6d5368cd9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _isTrigger: 0
+  tsMaterial: {fileID: 0}
+  center:
+    x:
+      _serializedValue: -4294967296
+    y:
+      _serializedValue: 0
+    z:
+      _serializedValue: 0
+  lossyScale:
+    x:
+      _serializedValue: 4294967296
+    y:
+      _serializedValue: 4294967296
+    z:
+      _serializedValue: 4294967296
+  tsTransform: {fileID: 114455159209940372}
+  _radius:
+    _serializedValue: 2147483648
 --- !u!114 &114252886035427034
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -217,3 +248,5 @@ MonoBehaviour:
   localOwner:
     id: 0
     name: 
+  forceFactor:
+    _serializedValue: 4294967296

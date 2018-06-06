@@ -568,7 +568,7 @@ namespace TrueSync {
                 _localScale = trans.localScale.ToTSVector();
 
                 _serialized = true;
-                trans.hasChanged = false;
+                transform.hasChanged = false;
             }
         }
 
@@ -590,8 +590,8 @@ namespace TrueSync {
 
             transformCache.position = position.ToVector();
             transformCache.rotation = rotation.ToQuaternion();
-            transformCache.localScale = localScale.ToVector();
-            _lossyScale = transformCache.lossyScale.ToTSVector();
+            //transformCache.localScale = localScale.ToVector();
+            //_lossyScale = transformCache.lossyScale.ToTSVector();
         }
 
         private void UpdateChildTransform()

@@ -46,10 +46,10 @@ public class MoveCube : TrueSyncBehaviour
         isCollide = false;
     }
 
-    public override void OnSyncedCollisionEnter(TSCollision other)
-    {
-        isCollide = other.collider is TSBoxCollider;
-    }
+    //public override void OnSyncedCollisionEnter(TSCollision other)
+    //{
+    //    isCollide = other.collider is TSBoxCollider;
+    //}
 
     //public override void OnSyncedCollisionExit(TSCollision other)
     //{
