@@ -356,13 +356,13 @@ namespace TrueSync.Physics3D {
         /// the timestep influences the energy added to the body.
         /// </summary>
         /// <param name="force">The force to add next <see cref="World.Step"/>.</param>
-        /// <param name="relativePosition">The position where the force gets applied
-        /// in Body coordinate frame.</param>
-        public void AddForce(TSVector force, TSVector relativePosition)
+        /// <param name="pos">The position where the force is applied.</param>
+        public void AddForce(TSVector force, TSVector pos)
         {
             TSVector.Add(ref this.force, ref force, out this.force);
-            TSVector.Cross(ref force, ref relativePosition, out relativePosition);
-            TSVector.Add(ref relativePosition, ref this.torque, out this.torque);
+            TSVector.Subtract(ref pos, ref this.position, out pos);
+            TSVector.Cross(ref force, ref pos, out pos);
+            TSVector.Add(ref pos, ref this.torque, out this.torque);
         }
 
         /// <summary>
