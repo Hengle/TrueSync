@@ -214,7 +214,7 @@ namespace TrueSync {
 
             Gizmos.color = Color.yellow;
 
-			Matrix4x4 cubeTransform = Matrix4x4.TRS(position, rotation, GetGizmosSize());
+            Matrix4x4 cubeTransform = Matrix4x4.TRS(position, rotation, GetGizmosSize());
             Matrix4x4 oldGizmosMatrix = Gizmos.matrix;
 
             Gizmos.matrix *= cubeTransform;
@@ -222,6 +222,77 @@ namespace TrueSync {
             DrawGizmos();
 
             Gizmos.matrix = oldGizmosMatrix;
+
+            if (_body != null && _body.EnableDebugDraw)
+            {
+                TSBBox bounds;
+                _body.Shape.GetBoundingBox(ref _body.orientation, out bounds);
+                Vector3 v3Center = _body.Position.ToVector();
+                Vector3 v3Extents = _body.boundingBox.extents.ToVector();
+
+                // Front top left corner
+                Vector3 v3FrontTopLeft;               
+                v3FrontTopLeft.x = v3Center.x - v3Extents.x;
+                v3FrontTopLeft.y = v3Center.y + v3Extents.y;
+                v3FrontTopLeft.z = v3Center.z - v3Extents.z;
+
+                // Front top right corner
+                Vector3 v3FrontTopRight;
+                v3FrontTopRight.x = v3Center.x + v3Extents.x;
+                v3FrontTopRight.y = v3Center.y + v3Extents.y;
+                v3FrontTopRight.z = v3Center.z - v3Extents.z;
+
+                // Front bottom left corner
+                Vector3 v3FrontBottomLeft;
+                v3FrontBottomLeft.x = v3Center.x - v3Extents.x;
+                v3FrontBottomLeft.y = v3Center.y - v3Extents.y;
+                v3FrontBottomLeft.z = v3Center.z - v3Extents.z;
+
+                // Front bottom right corner
+                Vector3 v3FrontBottomRight;
+                v3FrontBottomRight.x = v3Center.x + v3Extents.x;
+                v3FrontBottomRight.y = v3Center.y - v3Extents.y;
+                v3FrontBottomRight.z = v3Center.z - v3Extents.z;
+                // Back top left corner
+                Vector3 v3BackTopLeft;
+                v3BackTopLeft.x = v3Center.x - v3Extents.x;
+                v3BackTopLeft.y = v3Center.y + v3Extents.y;
+                v3BackTopLeft.z = v3Center.z + v3Extents.z;
+
+                // Back top right corner
+                Vector3 v3BackTopRight;
+                v3BackTopRight.x = v3Center.x + v3Extents.x;
+                v3BackTopRight.y = v3Center.y + v3Extents.y;
+                v3BackTopRight.z = v3Center.z + v3Extents.z;
+
+                // Back bottom left corner
+                Vector3 v3BackBottomLeft;
+                v3BackBottomLeft.x = v3Center.x - v3Extents.x;
+                v3BackBottomLeft.y = v3Center.y - v3Extents.y;
+                v3BackBottomLeft.z = v3Center.z + v3Extents.z;
+
+                // Back bottom right corner
+                Vector3 v3BackBottomRight;
+                v3BackBottomRight.x = v3Center.x + v3Extents.x;
+                v3BackBottomRight.y = v3Center.y - v3Extents.y;
+                v3BackBottomRight.z = v3Center.z + v3Extents.z;
+
+                Gizmos.color = Color.red;
+                Gizmos.DrawLine(v3FrontTopLeft, v3FrontTopRight);
+                Gizmos.DrawLine(v3FrontTopRight, v3FrontBottomRight);
+                Gizmos.DrawLine(v3FrontBottomRight, v3FrontBottomLeft);
+                Gizmos.DrawLine(v3FrontBottomLeft, v3FrontTopLeft);
+
+                Gizmos.DrawLine(v3BackTopLeft, v3BackTopRight);
+                Gizmos.DrawLine(v3BackTopRight, v3BackBottomRight);
+                Gizmos.DrawLine(v3BackBottomRight, v3BackBottomLeft);
+                Gizmos.DrawLine(v3BackBottomLeft, v3BackTopLeft);
+
+                Gizmos.DrawLine(v3FrontTopLeft, v3BackTopLeft);
+                Gizmos.DrawLine(v3FrontTopRight, v3BackTopRight);
+                Gizmos.DrawLine(v3FrontBottomRight, v3BackBottomRight);
+                Gizmos.DrawLine(v3FrontBottomLeft, v3BackBottomLeft);
+            }
         }
 
         /**
