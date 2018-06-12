@@ -33,7 +33,16 @@ namespace TrueSync {
         /**
         *  @brief {@link TSCollider} of the body hit
         **/
-        public TSCollider collider;
+        private TSCollider _collider = null;
+        public TSCollider collider
+        {
+            get
+            {
+                if (_collider == null)
+                    _collider = this.gameObject.GetComponent<TSCollider>();
+                return _collider;
+            }
+        }
 
         /**
         *  @brief GameObject of the body hit
@@ -43,7 +52,16 @@ namespace TrueSync {
         /**
         *  @brief {@link TSRigidBody} of the body hit, if there is one attached
         **/
-        public TSRigidBody rigidbody;
+        private TSRigidBody _rigidbody = null;
+        public TSRigidBody rigidbody
+        {
+            get
+            {
+                if (_rigidbody == null)
+                    _rigidbody = this.gameObject.GetComponent<TSRigidBody>();
+                return _rigidbody;
+            }
+        }
 
         /**
         *  @brief {@link TSTransform} of the body hit
@@ -58,8 +76,6 @@ namespace TrueSync {
         internal void Update(GameObject otherGO, Contact c) {
             if (this.gameObject == null) {
                 this.gameObject = otherGO;
-                this.collider = this.gameObject.GetComponent<TSCollider>();
-                this.rigidbody = this.gameObject.GetComponent<TSRigidBody>();
                 this.transform = this.collider.tsTransform;
             }
 

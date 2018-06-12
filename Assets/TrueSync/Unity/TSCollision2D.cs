@@ -32,7 +32,16 @@ namespace TrueSync {
         /**
         *  @brief {@link TSCollider} of the body hit
         **/
-        public TSCollider2D collider;
+        private TSCollider2D _collider = null;
+        public TSCollider2D collider
+        {
+            get
+            {
+                if (_collider == null)
+                    _collider = this.gameObject.GetComponent<TSCollider2D>();
+                return _collider;
+            }
+        }
 
         /**
         *  @brief GameObject of the body hit
@@ -42,7 +51,16 @@ namespace TrueSync {
         /**
         *  @brief {@link TSRigidBody} of the body hit, if there is one attached
         **/
-        public TSRigidBody2D rigidbody;
+        private TSRigidBody2D _rigidbody = null;
+        public TSRigidBody2D rigidbody
+        {
+            get
+            {
+                if (_rigidbody == null)
+                    _rigidbody = this.gameObject.GetComponent<TSRigidBody2D>();
+                return _rigidbody;
+            }
+        }
 
         /**
         *  @brief {@link TSTransform} of the body hit
@@ -57,8 +75,6 @@ namespace TrueSync {
         internal void Update(GameObject otherGO, Physics2D.Contact c) {
             if (this.gameObject == null) {
                 this.gameObject = otherGO;
-                this.collider = this.gameObject.GetComponent<TSCollider2D>();
-                this.rigidbody = this.gameObject.GetComponent<TSRigidBody2D>();
                 this.transform = this.collider.tsTransform;
             }
 
