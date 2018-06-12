@@ -103,9 +103,19 @@ namespace TrueSync
             }
         }
 
+        // Reference: http://forum.photonengine.com/discussion/10422/truesync-tsvector-clampmagnitude-is-inconsistent-with-unityengine-vector3-clampmagnitude
         public static TSVector4 ClampMagnitude(TSVector4 vector, FP maxLength)
         {
-            return Normalize(vector) * maxLength;
+            TSVector4 result;
+            if (vector.sqrMagnitude > maxLength * maxLength)
+            {
+                result = vector.normalized * maxLength;
+            }
+            else
+            {
+                result = vector;
+            }
+            return result;
         }
 
         /// <summary>
