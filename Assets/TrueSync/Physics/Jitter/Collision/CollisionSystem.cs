@@ -422,10 +422,8 @@ namespace TrueSync.Physics3D {
                                     {
                                         RaiseCollisionDetected(body1, body2, ref hit1, ref hit2, ref normal, penetration);
                                     }
-
                                 }
                             }
-
                         }
                         break;
                 }
