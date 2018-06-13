@@ -21,6 +21,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using C5;
 #endregion
 
 namespace TrueSync.Physics3D
@@ -69,84 +70,104 @@ namespace TrueSync.Physics3D
 
             internal void RaiseWorldPreStep(FP timestep)
             {
-                if (PreStep != null) PreStep(timestep);
+                if (PreStep != null)
+                    PreStep(timestep);
             }
 
             internal void RaiseWorldPostStep(FP timestep)
             {
-                if (PostStep != null) PostStep(timestep);
+                if (PostStep != null)
+                    PostStep(timestep);
             }
 
             internal void RaiseAddedRigidBody(RigidBody body)
             {
-                if (AddedRigidBody != null) AddedRigidBody(body);
+                if (AddedRigidBody != null)
+                    AddedRigidBody(body);
             }
 
             internal void RaiseRemovedRigidBody(RigidBody body)
             {
-                if (RemovedRigidBody != null) RemovedRigidBody(body);
+                if (RemovedRigidBody != null)
+                    RemovedRigidBody(body);
             }
 
             internal void RaiseAddedConstraint(Constraint constraint)
             {
-                if (AddedConstraint != null) AddedConstraint(constraint);
+                if (AddedConstraint != null)
+                    AddedConstraint(constraint);
             }
 
             internal void RaiseRemovedConstraint(Constraint constraint)
             {
-                if (RemovedConstraint != null) RemovedConstraint(constraint);
+                if (RemovedConstraint != null)
+                    RemovedConstraint(constraint);
             }
 
             internal void RaiseAddedSoftBody(SoftBody body)
             {
-                if (AddedSoftBody != null) AddedSoftBody(body);
+                if (AddedSoftBody != null)
+                    AddedSoftBody(body);
             }
 
             internal void RaiseRemovedSoftBody(SoftBody body)
             {
-                if (RemovedSoftBody != null) RemovedSoftBody(body);
+                if (RemovedSoftBody != null)
+                    RemovedSoftBody(body);
             }
 
             internal void RaiseBodiesBeginCollide(Contact contact)
             {
-                if (BodiesBeginCollide != null) BodiesBeginCollide(contact);
+                if (BodiesBeginCollide != null)
+                    BodiesBeginCollide(contact);
             }
 
 			internal void RaiseBodiesStayCollide(Contact contact)
 			{
-				if (BodiesStayCollide != null) BodiesStayCollide(contact);
+				if (BodiesStayCollide != null)
+                    BodiesStayCollide(contact);
 			}
 
             internal void RaiseBodiesEndCollide(RigidBody body1, RigidBody body2)
             {
-                if (BodiesEndCollide != null) BodiesEndCollide(body1, body2);
+                if (BodiesEndCollide != null)
+                    BodiesEndCollide(body1, body2);
             }
 
-            internal void RaiseTriggerBeginCollide(Contact contact) {
-                if (TriggerBeginCollide != null) TriggerBeginCollide(contact);
+            internal void RaiseTriggerBeginCollide(Contact contact)
+            {
+                if (TriggerBeginCollide != null)
+                    TriggerBeginCollide(contact);
             }
 
-            internal void RaiseTriggerStayCollide(Contact contact) {
-                if (TriggerStayCollide != null) TriggerStayCollide(contact);
+            internal void RaiseTriggerStayCollide(Contact contact)
+            {
+                if (TriggerStayCollide != null)
+                    TriggerStayCollide(contact);
             }
 
-            internal void RaiseTriggerEndCollide(RigidBody body1, RigidBody body2) {
-                if (TriggerEndCollide != null) TriggerEndCollide(body1, body2);
+            internal void RaiseTriggerEndCollide(RigidBody body1, RigidBody body2)
+            {
+                if (TriggerEndCollide != null)
+                    TriggerEndCollide(body1, body2);
             }
 
             internal void RaiseActivatedBody(RigidBody body)
             {
-                if (ActivatedBody != null) ActivatedBody(body);
+                if (ActivatedBody != null)
+                    ActivatedBody(body);
             }
 
             internal void RaiseDeactivatedBody(RigidBody body)
             {
-                if (DeactivatedBody != null) DeactivatedBody(body);
+                if (DeactivatedBody != null)
+                    DeactivatedBody(body);
             }
 
             internal void RaiseContactCreated(Contact contact)
             {
-                if (ContactCreated != null) ContactCreated(contact);
+                if (ContactCreated != null)
+                    ContactCreated(contact);
             }
 
             #endregion
@@ -166,8 +187,8 @@ namespace TrueSync.Physics3D
 
         public IslandManager islands = new IslandManager();
 
-		public HashList<OverlapPairContact> initialCollisions = new HashList<OverlapPairContact>();
-        public HashList<OverlapPairContact> initialTriggers = new HashList<OverlapPairContact>();
+		public HashDictionary<OverlapPairContact, Contact> initialCollisions = new HashDictionary<OverlapPairContact, Contact>();
+        public HashDictionary<OverlapPairContact, Contact> initialTriggers = new HashDictionary<OverlapPairContact, Contact>();
         private OverlapPairContact cacheOverPairContact = new OverlapPairContact(null, null);
 
         internal HashList<RigidBody> rigidBodies = new HashList<RigidBody>();
@@ -439,38 +460,46 @@ namespace TrueSync.Physics3D
         private bool RemoveBody(RigidBody body, bool removeMassPoints)
         {
             // Its very important to clean up, after removing a body
-            if (!removeMassPoints && body.IsParticle) return false;
+            if (!removeMassPoints && body.IsParticle)
+                return false;
 
             // remove the body from the world list
-            if (!rigidBodies.Remove(body)) return false;
+            if (!rigidBodies.Remove(body))
+                return false;
 
             // Remove all connected constraints and arbiters
-            for (int index = 0, length = body.arbiters.Count; index < length; index++) {
+            for (int index = 0, length = body.arbiters.Count; index < length; index++)
+            {
                 Arbiter arbiter = body.arbiters[index];
-
                 arbiterMap.Remove(arbiter);
-
                 events.RaiseBodiesEndCollide(arbiter.body1, arbiter.body2);
 
                 cacheOverPairContact.SetBodies(arbiter.body1, arbiter.body2);
-				initialCollisions.Remove (cacheOverPairContact);
+                Contact.Pool.GiveBack(initialCollisions[cacheOverPairContact]);
+                initialCollisions.Remove(cacheOverPairContact);
             }
 
-            for (int index = 0, length = body.arbitersTrigger.Count; index < length; index++) {
+            for (int index = 0, length = body.arbitersTrigger.Count; index < length; index++)
+            {
                 Arbiter arbiter = body.arbitersTrigger[index];
                 arbiterTriggerMap.Remove(arbiter);
 
-                if (arbiter.body1.isColliderOnly) {
+                if (arbiter.body1.isColliderOnly)
+                {
                     events.RaiseTriggerEndCollide(arbiter.body1, arbiter.body2);
-                } else {
+                }
+                else
+                {
                     events.RaiseTriggerEndCollide(arbiter.body2, arbiter.body1);
                 }
 
                 cacheOverPairContact.SetBodies(arbiter.body1, arbiter.body2);
+                Contact.Pool.GiveBack(initialTriggers[cacheOverPairContact]);
                 initialTriggers.Remove(cacheOverPairContact);
             }
 
-            for (int index = 0, length = body.constraints.Count; index < length; index++) {
+            for (int index = 0, length = body.constraints.Count; index < length; index++)
+            {
                 Constraint constraint = body.constraints[index];
 
                 constraints.Remove(constraint);
@@ -587,14 +616,25 @@ namespace TrueSync.Physics3D
 
             UpdateContacts();
 
-            for (int index = 0, length = initialCollisions.Count; index < length; index++) {
-                OverlapPairContact op = initialCollisions[index];
-                events.RaiseBodiesStayCollide(op.contact);
-			}
+   //         for (int index = 0, length = initialCollisions.Count; index < length; index++)
+   //         {
+   //             OverlapPairContact op = initialCollisions[index];
+   //             events.RaiseBodiesStayCollide(op.contact);
+			//}
+            foreach (C5.KeyValuePair<OverlapPairContact, Contact> pair in initialCollisions)
+            {
+                events.RaiseBodiesStayCollide(pair.Value);
+            }
 
-            for (int index = 0, length = initialTriggers.Count; index < length; index++) {
-                OverlapPairContact op = initialTriggers[index];
-                events.RaiseTriggerStayCollide(op.contact);
+            //for (int index = 0, length = initialTriggers.Count; index < length; index++)
+            //{
+            //    OverlapPairContact op = initialTriggers[index];
+            //    events.RaiseTriggerStayCollide(op.contact);
+            //}
+
+            foreach (C5.KeyValuePair<OverlapPairContact, Contact> pair in initialTriggers)
+            {
+                events.RaiseTriggerStayCollide(pair.Value);
             }
 
             while (removedArbiterQueue.Count > 0)
@@ -602,7 +642,8 @@ namespace TrueSync.Physics3D
                 islands.ArbiterRemoved(removedArbiterQueue.Dequeue());
             }
 
-            for (int index = 0, length = softbodies.Count; index < length; index++) {
+            for (int index = 0, length = softbodies.Count; index < length; index++)
+            {
                 SoftBody body = softbodies[index];
                 body.Update(timestep);
                 body.DoSelfCollision(collisionDetectionHandler);
@@ -718,30 +759,41 @@ namespace TrueSync.Physics3D
             UpdateContacts(arbiterTriggerMap);
         }
 
-        private void UpdateContacts(ArbiterMap selectedArbiterMap) {
-            foreach (Arbiter arbiter in selectedArbiterMap.Arbiters) {
+        private void UpdateContacts(ArbiterMap selectedArbiterMap)
+        {
+            foreach (Arbiter arbiter in selectedArbiterMap.Arbiters)
+            {
                 UpdateArbiterContacts(arbiter);
             }
 
-            while (removedArbiterStack.Count > 0) {
+            while (removedArbiterStack.Count > 0)
+            {
                 Arbiter arbiter = removedArbiterStack.Pop();
                 Arbiter.Pool.GiveBack(arbiter);
                 selectedArbiterMap.Remove(arbiter);
                                
-                if (selectedArbiterMap == arbiterMap) {
+                if (selectedArbiterMap == arbiterMap)
+                {
                     removedArbiterQueue.Enqueue(arbiter);
                     events.RaiseBodiesEndCollide(arbiter.body1, arbiter.body2);
 
                     cacheOverPairContact.SetBodies(arbiter.body1, arbiter.body2);
+                    Contact.Pool.GiveBack(initialCollisions[cacheOverPairContact]);
                     initialCollisions.Remove(cacheOverPairContact);
-                } else {
-                    if (arbiter.body1.isColliderOnly) {
+                }
+                else
+                {
+                    if (arbiter.body1.isColliderOnly)
+                    {
                         events.RaiseTriggerEndCollide(arbiter.body1, arbiter.body2);
-                    } else {
+                    }
+                    else
+                    {
                         events.RaiseTriggerEndCollide(arbiter.body2, arbiter.body1);
                     }
 
                     cacheOverPairContact.SetBodies(arbiter.body1, arbiter.body2);
+                    Contact.Pool.GiveBack(initialTriggers[cacheOverPairContact]);
                     initialTriggers.Remove(cacheOverPairContact);
                 }
             }
@@ -942,11 +994,11 @@ namespace TrueSync.Physics3D
 
             bool arbiterCreated = false;
 
-            selectedArbiterMap.LookUpArbiter(body1, body2, out arbiter);
-            if (arbiter == null)
+            if (!selectedArbiterMap.LookUpArbiter(body1, body2, out arbiter))
             {
                 arbiter = Arbiter.Pool.GetNew();
-                arbiter.body1 = body1; arbiter.body2 = body2;
+                arbiter.body1 = body1;
+                arbiter.body2 = body2;
                 selectedArbiterMap.lookUpKey.body1 = body1;
                 selectedArbiterMap.lookUpKey.body2 = body2;
                 selectedArbiterMap.Add(selectedArbiterMap.lookUpKey.GetHashCode(), arbiter);
@@ -955,7 +1007,6 @@ namespace TrueSync.Physics3D
             }
 
             Contact contact = null;
-
             if (arbiter.body1 == body1) {
                 TSVector.Negate(ref normal, out normal);
                 contact = arbiter.AddContact(point1, point2, normal, penetration, contactSettings);
@@ -963,31 +1014,40 @@ namespace TrueSync.Physics3D
                 contact = arbiter.AddContact(point2, point1, normal, penetration, contactSettings);
             }
 
-            if (arbiterCreated) { 
-                if (anyBodyColliderOnly) {
+            if (arbiterCreated)
+            {
+                Contact raiseContact = Contact.Pool.GetNew();
+                if (contact != null)
+                    raiseContact.Initialize(contact.body1, contact.body2, ref contact.p1, ref contact.p2, ref contact.normal, contact.penetration, contact.newContact, contact.settings);
+                if (anyBodyColliderOnly)
+                {
                     /*if (body1.isColliderOnly) {
                         events.RaiseTriggerBeginCollide(body1, body2);
                     } else {
                         events.RaiseTriggerBeginCollide(body2, body1);
                     }*/
 
-                    events.RaiseTriggerBeginCollide(contact);
+                    events.RaiseTriggerBeginCollide(raiseContact);
 
                     body1.arbitersTrigger.Add(arbiter);
                     body2.arbitersTrigger.Add(arbiter);
 
                     OverlapPairContact overlapContact = new OverlapPairContact(body1, body2);
-                    overlapContact.contact = contact;
+                    overlapContact.contact = raiseContact;
 
-                    initialTriggers.Add(overlapContact);
-                } else {
-                    events.RaiseBodiesBeginCollide(contact);
+                    //initialTriggers.Add(overlapContact);
+                    initialTriggers[overlapContact] = raiseContact;
+                }
+                else
+                {
+                    events.RaiseBodiesBeginCollide(raiseContact);
                     addedArbiterQueue.Enqueue(arbiter);
 
                     OverlapPairContact overlapContact = new OverlapPairContact(body1, body2);
-                    overlapContact.contact = contact;
+                    overlapContact.contact = raiseContact;
 
-                    initialCollisions.Add(overlapContact);
+                    //initialCollisions.Add(overlapContact);
+                    initialCollisions[overlapContact] = raiseContact;
                 }
             }
 
@@ -1012,19 +1072,27 @@ namespace TrueSync.Physics3D
                 bool deactivateIsland = true;
 
                 // global allowdeactivation
-                if (!this.AllowDeactivation) deactivateIsland = false;
+                if (!this.AllowDeactivation)
+                {
+                    deactivateIsland = false;
+                }
                 else
                 {
-                    for (int index = 0, length = island.bodies.Count; index < length; index++) {
+                    for (int index = 0, length = island.bodies.Count; index < length; index++)
+                    {
                         RigidBody body = island.bodies[index];
                         // body allowdeactivation
                         if (body.AllowDeactivation && (body.angularVelocity.sqrMagnitude < inactiveAngularThresholdSq &&
-                        (body.linearVelocity.sqrMagnitude < inactiveLinearThresholdSq))) {
+                        (body.linearVelocity.sqrMagnitude < inactiveLinearThresholdSq)))
+                        {
                             body.inactiveTime += timestep;
-                            if (body.inactiveTime < deactivationTime) {
+                            if (body.inactiveTime < deactivationTime)
+                            {
                                 deactivateIsland = false;
                             }
-                        } else {
+                        }
+                        else
+                        {
                             body.inactiveTime = FP.Zero;
                             deactivateIsland = false;
                         }
@@ -1047,7 +1115,6 @@ namespace TrueSync.Physics3D
                             events.RaiseActivatedBody(body);
                         }
                     }
-                    
                 }
             }
         }

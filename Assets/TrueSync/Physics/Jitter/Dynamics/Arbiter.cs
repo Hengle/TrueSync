@@ -141,8 +141,11 @@ namespace TrueSync.Physics3D {
         internal RigidBody body1, body2;
         internal ContactList contactList;
 
-		public void CleanUp() {
-			contactList.Clear ();
+		public void CleanUp()
+        {
+            body1 = null;
+            body2 = null;
+			contactList.Clear();
 		}
 
         /// <summary>

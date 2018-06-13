@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using C5;
 
 namespace TrueSync.Physics3D {
  
@@ -13,10 +14,10 @@ namespace TrueSync.Physics3D {
 		public CollisionSystemPersistentSAPClone cloneCollision = new CollisionSystemPersistentSAPClone();
 
 		public List<ArbiterClone> clonedArbiters = new List<ArbiterClone>();
-		public List<OverlapPairContact> clonedInitialCollisions = new List<OverlapPairContact>();
+		public HashDictionary<OverlapPairContact, Contact> clonedInitialCollisions = new HashDictionary<OverlapPairContact, Contact>();
 
         public List<ArbiterClone> clonedArbitersTrigger = new List<ArbiterClone>();
-        public List<OverlapPairContact> clonedInitialTriggers = new List<OverlapPairContact>();
+        public HashDictionary<OverlapPairContact, Contact> clonedInitialTriggers = new HashDictionary<OverlapPairContact, Contact>();
 
         public int rigidBodyInstanceCount;
         public int constraintInstanceCount;
@@ -123,10 +124,10 @@ namespace TrueSync.Physics3D {
 			cloneCollision.Clone ((CollisionSystemPersistentSAP) world.CollisionSystem);
 
 			clonedInitialCollisions.Clear();
-			clonedInitialCollisions.AddRange (world.initialCollisions);
+			clonedInitialCollisions.AddAll(world.initialCollisions);
 
             clonedInitialTriggers.Clear();
-            clonedInitialTriggers.AddRange(world.initialTriggers);
+            clonedInitialTriggers.AddAll(world.initialTriggers);
 
             rigidBodyInstanceCount = RigidBody.instanceCount;
             constraintInstanceCount = Constraint.instanceCount;
@@ -227,10 +228,10 @@ namespace TrueSync.Physics3D {
             cloneCollision.Restore ((CollisionSystemPersistentSAP) world.CollisionSystem);
 
 			world.initialCollisions.Clear ();
-			world.initialCollisions.AddRange (clonedInitialCollisions);
+			world.initialCollisions.AddAll(clonedInitialCollisions);
 
             world.initialTriggers.Clear();
-            world.initialTriggers.AddRange(clonedInitialTriggers);
+            world.initialTriggers.AddAll(clonedInitialTriggers);
 
             RigidBody.instanceCount = rigidBodyInstanceCount;
             Constraint.instanceCount = constraintInstanceCount;

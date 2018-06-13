@@ -265,10 +265,11 @@ namespace TrueSync {
                 return;
             }
 
+            TSCollision collision = null;
             HashList<TrueSyncBehaviour> b1Behaviours = behavioursMap[body1];
+            collision = GetCollisionInfo(body1, body2, c);
             for (int i =0, count = b1Behaviours.Count; i<count; i++)
             {
-                TSCollision collision = GetCollisionInfo(body1, body2, c);
                 if (String.Equals(callbackName, "OnSyncedCollisionEnter", StringComparison.InvariantCultureIgnoreCase))
                     b1Behaviours[i].OnSyncedCollisionEnter(collision);
                 else if (String.Equals(callbackName, "OnSyncedCollisionStay", StringComparison.InvariantCultureIgnoreCase))
@@ -284,9 +285,9 @@ namespace TrueSync {
             }
 
             HashList<TrueSyncBehaviour> b2Behaviours = behavioursMap[body2];
+            collision = GetCollisionInfo(body2, body1, c);
             for (int i = 0, count = b2Behaviours.Count; i < count; i++)
             {
-                TSCollision collision = GetCollisionInfo(body2, body1, c);
                 if (String.Equals(callbackName, "OnSyncedCollisionEnter", StringComparison.InvariantCultureIgnoreCase))
                     b2Behaviours[i].OnSyncedCollisionEnter(collision);
                 else if (String.Equals(callbackName, "OnSyncedCollisionStay", StringComparison.InvariantCultureIgnoreCase))
@@ -319,8 +320,6 @@ namespace TrueSync {
                 result = new TSCollision();
                 collisionInfoBody1.Add(body2, result);
             }
-
-
             result.Update(gameObjectMap[body2], c);
 
             return result;
