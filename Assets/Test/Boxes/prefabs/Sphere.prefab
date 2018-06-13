@@ -5,15 +5,15 @@ GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
-  serializedVersion: 4
+  serializedVersion: 5
   m_Component:
-  - 4: {fileID: 487116}
-  - 33: {fileID: 3333692}
-  - 23: {fileID: 2321544}
-  - 114: {fileID: 11464748}
-  - 114: {fileID: 11417102}
-  - 114: {fileID: 11489160}
-  - 114: {fileID: 11422370}
+  - component: {fileID: 487116}
+  - component: {fileID: 3333692}
+  - component: {fileID: 2321544}
+  - component: {fileID: 11464748}
+  - component: {fileID: 11417102}
+  - component: {fileID: 11489160}
+  - component: {fileID: 11422370}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -30,10 +30,10 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 14.749969, y: 2.75, z: -4.538079}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!23 &2321544
 MeshRenderer:
   m_ObjectHideFlags: 1
@@ -43,22 +43,31 @@ MeshRenderer:
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 4294967295
   m_Materials:
   - {fileID: 2100000, guid: ed79d071825cc4ec5b2e5ef86bc1ecea, type: 2}
-  m_SubsetIndices: 
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
   m_StaticBatchRoot: {fileID: 0}
-  m_UseLightProbes: 1
-  m_ReflectionProbeUsage: 1
   m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
   m_ScaleInLightmap: 1
   m_PreserveUVs: 1
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
+  m_StitchLightmapSeams: 0
+  m_SelectedEditorRenderState: 3
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
+  m_SortingLayer: 0
   m_SortingOrder: 0
 --- !u!33 &3333692
 MeshFilter:
@@ -78,7 +87,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4c7bd8f1459c9546b38fea6d5368cd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isTrigger: 0
+  _isTrigger: 0
   tsMaterial: {fileID: 0}
   center:
     x:
@@ -95,7 +104,8 @@ MonoBehaviour:
     z:
       _serializedValue: 4294967296
   tsTransform: {fileID: 0}
-  _radius: 0.5
+  _radius:
+    _serializedValue: 2147483648
 --- !u!114 &11422370
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -111,8 +121,12 @@ MonoBehaviour:
     _serializedValue: 4294967296
   _useGravity: 1
   _isKinematic: 0
+  _linearDrag:
+    _serializedValue: 0
+  _angularDrag:
+    _serializedValue: 214748368
   interpolation: 0
-  freezeZAxis: 0
+  _constraints: 0
 --- !u!114 &11464748
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -145,12 +159,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df3e4ecc2c78eaa409dad488c230d65d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _localPosition:
+    x:
+      _serializedValue: 0
+    y:
+      _serializedValue: 0
+    z:
+      _serializedValue: 0
   _position:
     x:
       _serializedValue: 0
     y:
       _serializedValue: 0
     z:
+      _serializedValue: 0
+  _localRotation:
+    x:
+      _serializedValue: 0
+    y:
+      _serializedValue: 0
+    z:
+      _serializedValue: 0
+    w:
       _serializedValue: 0
   _rotation:
     x:
@@ -161,7 +191,14 @@ MonoBehaviour:
       _serializedValue: 0
     w:
       _serializedValue: 0
-  _scale:
+  _lossyScale:
+    x:
+      _serializedValue: 0
+    y:
+      _serializedValue: 0
+    z:
+      _serializedValue: 0
+  _localScale:
     x:
       _serializedValue: 0
     y:
@@ -171,6 +208,7 @@ MonoBehaviour:
   _serialized: 0
   tsCollider: {fileID: 0}
   tsParent: {fileID: 0}
+  tsChildren: []
 --- !u!1001 &100100000
 Prefab:
   m_ObjectHideFlags: 1
