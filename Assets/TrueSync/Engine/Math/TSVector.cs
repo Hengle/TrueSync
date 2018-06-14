@@ -138,8 +138,13 @@ namespace TrueSync
             }
         }
 
-        public static TSVector Abs(TSVector other) {
-            return new TSVector(FP.Abs(other.x), FP.Abs(other.y), FP.Abs(other.z));
+        public static TSVector Abs(TSVector other)
+        {
+            TSVector result;
+            result.x = FP.Abs(other.x);
+            result.y = FP.Abs(other.y);
+            result.z = FP.Abs(other.z);
+            return result;
         }
 
         /// <summary>
