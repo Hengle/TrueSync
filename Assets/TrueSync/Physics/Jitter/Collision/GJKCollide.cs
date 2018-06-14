@@ -90,21 +90,33 @@ namespace TrueSync.Physics3D {
 
             simplexSolver.Reset();
 
-            while ((dist > epsilon) && (maxIter-- != 0)) {
+            while ((dist > epsilon) && (maxIter-- != 0))
+            {
                 SupportMapTransformed(support, ref orientation, ref position, ref v, out p);
                 TSVector.Subtract(ref x, ref p, out w);
 
                 FP VdotW = TSVector.Dot(ref v, ref w);
 
-                if (VdotW > FP.Zero) {
+                if (VdotW > FP.Zero)
+                {
                     VdotR = TSVector.Dot(ref v, ref r);
-
-                    if (VdotR >= -(TSMath.Epsilon * TSMath.Epsilon)) { simplexSolverPool.GiveBack(simplexSolver); return false; } else simplexSolver.Reset();
+                    if (VdotR >= -(TSMath.Epsilon * TSMath.Epsilon))
+                    {
+                        simplexSolverPool.GiveBack(simplexSolver);
+                        return false;
+                    }
+                    else
+                    {
+                        simplexSolver.Reset();
+                    }
                 }
-                if (!simplexSolver.InSimplex(w)) simplexSolver.AddVertex(w, x, p);
+                if (!simplexSolver.InSimplex(w))
+                    simplexSolver.AddVertex(w, x, p);
 
-                if (simplexSolver.Closest(out v)) dist = v.sqrMagnitude;
-                else dist = FP.Zero;
+                if (simplexSolver.Closest(out v))
+                    dist = v.sqrMagnitude;
+                else
+                    dist = FP.Zero;
             }
 
             simplexSolverPool.GiveBack(simplexSolver);
@@ -144,17 +156,25 @@ namespace TrueSync.Physics3D {
             FP distSq = v.sqrMagnitude;
             FP epsilon = CollideEpsilon;
 
-            while ((distSq > epsilon) && (maxIter-- != 0)) {
+            while ((distSq > epsilon) && (maxIter-- != 0))
+            {
                 vn = TSVector.Negate(v);
                 SupportMapTransformed(support1, ref orientation1, ref position1, ref vn, out supVertexA);
                 SupportMapTransformed(support2, ref orientation2, ref position2, ref v, out supVertexB);
                 w = supVertexA - supVertexB;
 
-                if (!simplexSolver.InSimplex(w)) simplexSolver.AddVertex(w, supVertexA, supVertexB);
-                if (simplexSolver.Closest(out v)) {
+                if (!simplexSolver.InSimplex(w))
+                    simplexSolver.AddVertex(w, supVertexA, supVertexB);
+
+                if (simplexSolver.Closest(out v))
+                {
                     distSq = v.sqrMagnitude;
                     normal = v;
-                } else distSq = FP.Zero;
+                }
+                else
+                {
+                    distSq = FP.Zero;
+                }
             }
 
 
@@ -312,19 +332,24 @@ namespace TrueSync.Physics3D {
 
             FP VdotR;
 
-            while ((distSq > epsilon) && (maxIter-- != 0)) {
+            while ((distSq > epsilon) && (maxIter-- != 0))
+            {
                 SupportMapTransformed(support, ref orientation, ref position, ref v, out p);
                 TSVector.Subtract(ref x, ref p, out w);
 
                 FP VdotW = TSVector.Dot(ref v, ref w);
 
-                if (VdotW > FP.Zero) {
+                if (VdotW > FP.Zero)
+                {
                     VdotR = TSVector.Dot(ref v, ref r);
 
-                    if (VdotR >= -TSMath.Epsilon) {
+                    if (VdotR >= -TSMath.Epsilon)
+                    {
                         simplexSolverPool.GiveBack(simplexSolver);
                         return false;
-                    } else {
+                    }
+                    else
+                    {
                         lambda = lambda - VdotW / VdotR;
                         TSVector.Multiply(ref r, lambda, out x);
                         TSVector.Add(ref origin, ref x, out x);
@@ -332,8 +357,15 @@ namespace TrueSync.Physics3D {
                         normal = v;
                     }
                 }
-                if (!simplexSolver.InSimplex(w)) simplexSolver.AddVertex(w, x, p);
-                if (simplexSolver.Closest(out v)) { distSq = v.sqrMagnitude; } else distSq = FP.Zero;
+                if (!simplexSolver.InSimplex(w))
+                    simplexSolver.AddVertex(w, x, p);
+
+                if (simplexSolver.Closest(out v))
+                {
+                    distSq = v.sqrMagnitude;
+                }
+                else
+                    distSq = FP.Zero;
             }
 
             #region Retrieving hitPoint
@@ -431,15 +463,17 @@ namespace TrueSync.Physics3D {
             }
         }
 
-        public void Reset() {
+        public void Reset()
+        {
             _cachedValidClosest = false;
             _numVertices = 0;
             _needsUpdate = true;
-            _lastW = new TSVector(FP.MaxValue, FP.MaxValue, FP.MaxValue);
+            _lastW = TSVector.one * FP.MaxValue;
             _cachedBC.Reset();
         }
 
-        public void AddVertex(TSVector w, TSVector p, TSVector q) {
+        public void AddVertex(TSVector w, TSVector p, TSVector q)
+        {
             _lastW = w;
             _needsUpdate = true;
 
@@ -451,19 +485,23 @@ namespace TrueSync.Physics3D {
         }
 
         //return/calculate the closest vertex
-        public bool Closest(out TSVector v) {
+        public bool Closest(out TSVector v)
+        {
             bool succes = UpdateClosestVectorAndPoints();
             v = _cachedV;
             return succes;
         }
 
-        public FP MaxVertex {
+        public FP MaxVertex
+        {
             get {
                 int numverts = NumVertices;
-                FP maxV = FP.Zero, curLen2;
-                for (int i = 0; i < numverts; i++) {
-                    curLen2 = _simplexVectorW[i].sqrMagnitude;
-                    if (maxV < curLen2) maxV = curLen2;
+                FP maxV = FP.Zero;
+                for (int i = 0; i < numverts; i++)
+                {
+                    FP curLen2 = _simplexVectorW[i].sqrMagnitude;
+                    if (maxV < curLen2)
+                        maxV = curLen2;
                 }
                 return maxV;
             }
@@ -475,7 +513,9 @@ namespace TrueSync.Physics3D {
             pBuf = new TSVector[numverts];
             qBuf = new TSVector[numverts];
             yBuf = new TSVector[numverts];
-            for (int i = 0; i < numverts; i++) {
+
+            for (int i = 0; i < numverts; i++)
+            {
                 yBuf[i] = _simplexVectorW[i];
                 pBuf[i] = _simplexPointsP[i];
                 qBuf[i] = _simplexPointsQ[i];
@@ -483,29 +523,35 @@ namespace TrueSync.Physics3D {
             return numverts;
         }
 
-        public bool InSimplex(TSVector w) {
+        public bool InSimplex(TSVector w)
+        {
             //check in case lastW is already removed
-            if (w == _lastW) return true;
+            if (w == _lastW)
+                return true;
 
             //w is in the current (reduced) simplex
             int numverts = NumVertices;
             for (int i = 0; i < numverts; i++)
-                if (_simplexVectorW[i] == w) return true;
+            {
+                if (_simplexVectorW[i] == w)
+                    return true;
+            }
 
             return false;
         }
 
-        public void BackupClosest(out TSVector v) {
+        public void BackupClosest(out TSVector v)
+        {
             v = _cachedV;
         }
 
-        public bool EmptySimplex {
-            get {
-                return NumVertices == 0;
-            }
+        public bool EmptySimplex
+        {
+            get { return NumVertices == 0; }
         }
 
-        public void ComputePoints(out TSVector p1, out TSVector p2) {
+        public void ComputePoints(out TSVector p1, out TSVector p2)
+        {
             UpdateClosestVectorAndPoints();
             p1 = _cachedPA;
             p2 = _cachedPB;
@@ -513,27 +559,39 @@ namespace TrueSync.Physics3D {
 
         #endregion
 
-        public void RemoveVertex(int index) {
+        public void RemoveVertex(int index)
+        {
             _numVertices--;
             _simplexVectorW[index] = _simplexVectorW[_numVertices];
             _simplexPointsP[index] = _simplexPointsP[_numVertices];
             _simplexPointsQ[index] = _simplexPointsQ[_numVertices];
         }
 
-        public void ReduceVertices(UsageBitfield usedVerts) {
-            if ((NumVertices >= 4) && (!usedVerts.UsedVertexD)) RemoveVertex(3);
-            if ((NumVertices >= 3) && (!usedVerts.UsedVertexC)) RemoveVertex(2);
-            if ((NumVertices >= 2) && (!usedVerts.UsedVertexB)) RemoveVertex(1);
-            if ((NumVertices >= 1) && (!usedVerts.UsedVertexA)) RemoveVertex(0);
+        public void ReduceVertices(UsageBitfield usedVerts)
+        {
+            if ((NumVertices >= 4) && (!usedVerts.UsedVertexD))
+                RemoveVertex(3);
+
+            if ((NumVertices >= 3) && (!usedVerts.UsedVertexC))
+                RemoveVertex(2);
+
+            if ((NumVertices >= 2) && (!usedVerts.UsedVertexB))
+                RemoveVertex(1);
+
+            if ((NumVertices >= 1) && (!usedVerts.UsedVertexA))
+                RemoveVertex(0);
         }
 
-        public bool UpdateClosestVectorAndPoints() {
-            if (_needsUpdate) {
+        public bool UpdateClosestVectorAndPoints()
+        {
+            if (_needsUpdate)
+            {
                 _cachedBC.Reset();
                 _needsUpdate = false;
 
                 TSVector p, a, b, c, d;
-                switch (NumVertices) {
+                switch (NumVertices)
+                {
                     case 0:
                         _cachedValidClosest = false;
                         break;
@@ -542,7 +600,7 @@ namespace TrueSync.Physics3D {
                         _cachedPB = _simplexPointsQ[0];
                         _cachedV = _cachedPA - _cachedPB;
                         _cachedBC.Reset();
-                        _cachedBC.SetBarycentricCoordinates(1f, FP.Zero, FP.Zero, FP.Zero);
+                        _cachedBC.SetBarycentricCoordinates(FP.One, FP.Zero, FP.Zero, FP.Zero);
                         _cachedValidClosest = _cachedBC.IsValid;
                         break;
                     case 2:
@@ -551,96 +609,106 @@ namespace TrueSync.Physics3D {
                         TSVector to = _simplexVectorW[1];
                         //TSVector nearest;
 
-                        TSVector diff = from * (-1);
+                        TSVector diff = TSVector.Negate(from);
                         TSVector v = to - from;
                         FP t = TSVector.Dot(v, diff);
 
-                        if (t > 0) {
+                        if (t > FP.Zero)
+                        {
                             FP dotVV = v.sqrMagnitude;
-                            if (t < dotVV) {
+                            if (t < dotVV)
+                            {
                                 t /= dotVV;
                                 diff -= t * v;
-                                _cachedBC.UsedVertices.UsedVertexA = true;
-                                _cachedBC.UsedVertices.UsedVertexB = true;
-                            } else {
-                                t = 1;
+                                _cachedBC.usedVertices.UsedVertexA = true;
+                                _cachedBC.usedVertices.UsedVertexB = true;
+                            }
+                            else
+                            {
+                                t = FP.One;
                                 diff -= v;
                                 //reduce to 1 point
-                                _cachedBC.UsedVertices.UsedVertexB = true;
+                                _cachedBC.usedVertices.UsedVertexB = true;
                             }
-                        } else {
-                            t = 0;
+                        }
+                        else
+                        {
+                            t = FP.Zero;
                             //reduce to 1 point
-                            _cachedBC.UsedVertices.UsedVertexA = true;
+                            _cachedBC.usedVertices.UsedVertexA = true;
                         }
 
-                        _cachedBC.SetBarycentricCoordinates(1 - t, t, 0, 0);
+                        _cachedBC.SetBarycentricCoordinates(FP.One - t, t, FP.Zero, FP.Zero);
                         //nearest = from + t * v;
 
                         _cachedPA = _simplexPointsP[0] + t * (_simplexPointsP[1] - _simplexPointsP[0]);
                         _cachedPB = _simplexPointsQ[0] + t * (_simplexPointsQ[1] - _simplexPointsQ[0]);
                         _cachedV = _cachedPA - _cachedPB;
 
-                        ReduceVertices(_cachedBC.UsedVertices);
+                        ReduceVertices(_cachedBC.usedVertices);
 
                         _cachedValidClosest = _cachedBC.IsValid;
                         break;
                     case 3:
                         //closest point origin from triangle
-                        p = new TSVector();
+                        p = TSVector.zero;
                         a = _simplexVectorW[0];
                         b = _simplexVectorW[1];
                         c = _simplexVectorW[2];
 
                         ClosestPtPointTriangle(p, a, b, c, ref _cachedBC);
-                        _cachedPA = _simplexPointsP[0] * _cachedBC.BarycentricCoords[0] +
-                                        _simplexPointsP[1] * _cachedBC.BarycentricCoords[1] +
-                                        _simplexPointsP[2] * _cachedBC.BarycentricCoords[2] +
-                                        _simplexPointsP[3] * _cachedBC.BarycentricCoords[3];
+                        _cachedPA = _simplexPointsP[0] * _cachedBC.barycentricCoords[0] +
+                                        _simplexPointsP[1] * _cachedBC.barycentricCoords[1] +
+                                        _simplexPointsP[2] * _cachedBC.barycentricCoords[2];
 
-                        _cachedPB = _simplexPointsQ[0] * _cachedBC.BarycentricCoords[0] +
-                                        _simplexPointsQ[1] * _cachedBC.BarycentricCoords[1] +
-                                        _simplexPointsQ[2] * _cachedBC.BarycentricCoords[2] +
-                                        _simplexPointsQ[3] * _cachedBC.BarycentricCoords[3];
+                        _cachedPB = _simplexPointsQ[0] * _cachedBC.barycentricCoords[0] +
+                                        _simplexPointsQ[1] * _cachedBC.barycentricCoords[1] +
+                                        _simplexPointsQ[2] * _cachedBC.barycentricCoords[2];
 
                         _cachedV = _cachedPA - _cachedPB;
 
-                        ReduceVertices(_cachedBC.UsedVertices);
+                        ReduceVertices(_cachedBC.usedVertices);
                         _cachedValidClosest = _cachedBC.IsValid;
                         break;
                     case 4:
-                        p = new TSVector();
+                        p = TSVector.zero;
                         a = _simplexVectorW[0];
                         b = _simplexVectorW[1];
                         c = _simplexVectorW[2];
                         d = _simplexVectorW[3];
 
-                        bool hasSeperation = ClosestPtPointTetrahedron(p, a, b, c, d, ref _cachedBC);
+                        bool hasSeparation = ClosestPtPointTetrahedron(p, a, b, c, d, ref _cachedBC);
 
-                        if (hasSeperation) {
-                            _cachedPA = _simplexPointsP[0] * _cachedBC.BarycentricCoords[0] +
-                                            _simplexPointsP[1] * _cachedBC.BarycentricCoords[1] +
-                                            _simplexPointsP[2] * _cachedBC.BarycentricCoords[2] +
-                                            _simplexPointsP[3] * _cachedBC.BarycentricCoords[3];
+                        if (hasSeparation)
+                        {
+                            _cachedPA = _simplexPointsP[0] * _cachedBC.barycentricCoords[0] +
+                                            _simplexPointsP[1] * _cachedBC.barycentricCoords[1] +
+                                            _simplexPointsP[2] * _cachedBC.barycentricCoords[2] +
+                                            _simplexPointsP[3] * _cachedBC.barycentricCoords[3];
 
-                            _cachedPB = _simplexPointsQ[0] * _cachedBC.BarycentricCoords[0] +
-                                            _simplexPointsQ[1] * _cachedBC.BarycentricCoords[1] +
-                                            _simplexPointsQ[2] * _cachedBC.BarycentricCoords[2] +
-                                            _simplexPointsQ[3] * _cachedBC.BarycentricCoords[3];
+                            _cachedPB = _simplexPointsQ[0] * _cachedBC.barycentricCoords[0] +
+                                            _simplexPointsQ[1] * _cachedBC.barycentricCoords[1] +
+                                            _simplexPointsQ[2] * _cachedBC.barycentricCoords[2] +
+                                            _simplexPointsQ[3] * _cachedBC.barycentricCoords[3];
 
                             _cachedV = _cachedPA - _cachedPB;
-                            ReduceVertices(_cachedBC.UsedVertices);
-                        } else {
-                            if (_cachedBC.Degenerate) {
+                            ReduceVertices(_cachedBC.usedVertices);
+                        }
+                        else
+                        {
+                            if (_cachedBC.degenerate)
+                            {
                                 _cachedValidClosest = false;
-                            } else {
+                            }
+                            else
+                            {
                                 _cachedValidClosest = true;
                                 //degenerate case == false, penetration = true + zero
                                 _cachedV.x = _cachedV.y = _cachedV.z = FP.Zero;
                             }
                             break; // !!!!!!!!!!!! proverit na vsakiy sluchai
                         }
-
+                        
                         _cachedValidClosest = _cachedBC.IsValid;
 
                         //closest point origin from tetrahedron
@@ -655,8 +723,9 @@ namespace TrueSync.Physics3D {
         }
 
         public bool ClosestPtPointTriangle(TSVector p, TSVector a, TSVector b, TSVector c,
-            ref SubSimplexClosestResult result) {
-            result.UsedVertices.Reset();
+            ref SubSimplexClosestResult result)
+        {
+            result.usedVertices.Reset();
 
             FP v, w;
 
@@ -666,10 +735,11 @@ namespace TrueSync.Physics3D {
             TSVector ap = p - a;
             FP d1 = TSVector.Dot(ab, ap);
             FP d2 = TSVector.Dot(ac, ap);
-            if (d1 <= FP.Zero && d2 <= FP.Zero) {
-                result.ClosestPointOnSimplex = a;
-                result.UsedVertices.UsedVertexA = true;
-                result.SetBarycentricCoordinates(1, 0, 0, 0);
+            if (d1 <= FP.Zero && d2 <= FP.Zero)
+            {
+                result.closestPointOnSimplex = a;
+                result.usedVertices.UsedVertexA = true;
+                result.SetBarycentricCoordinates(FP.One, FP.Zero, FP.Zero, FP.Zero);
                 return true; // a; // barycentric coordinates (1,0,0)
             }
 
@@ -677,21 +747,23 @@ namespace TrueSync.Physics3D {
             TSVector bp = p - b;
             FP d3 = TSVector.Dot(ab, bp);
             FP d4 = TSVector.Dot(ac, bp);
-            if (d3 >= FP.Zero && d4 <= d3) {
-                result.ClosestPointOnSimplex = b;
-                result.UsedVertices.UsedVertexB = true;
-                result.SetBarycentricCoordinates(0, 1, 0, 0);
+            if (d3 >= FP.Zero && d4 <= d3)
+            {
+                result.closestPointOnSimplex = b;
+                result.usedVertices.UsedVertexB = true;
+                result.SetBarycentricCoordinates(FP.Zero, FP.One, FP.Zero, FP.Zero);
 
                 return true; // b; // barycentric coordinates (0,1,0)
             }
             // Check if P in edge region of AB, if so return projection of P onto AB
             FP vc = d1 * d4 - d3 * d2;
-            if (vc <= FP.Zero && d1 >= FP.Zero && d3 <= FP.Zero) {
+            if (vc <= FP.Zero && d1 >= FP.Zero && d3 <= FP.Zero)
+            {
                 v = d1 / (d1 - d3);
-                result.ClosestPointOnSimplex = a + v * ab;
-                result.UsedVertices.UsedVertexA = true;
-                result.UsedVertices.UsedVertexB = true;
-                result.SetBarycentricCoordinates(1 - v, v, 0, 0);
+                result.closestPointOnSimplex = a + v * ab;
+                result.usedVertices.UsedVertexA = true;
+                result.usedVertices.UsedVertexB = true;
+                result.SetBarycentricCoordinates(FP.One - v, v, FP.Zero, FP.Zero);
                 return true;
                 //return a + v * ab; // barycentric coordinates (1-v,v,0)
             }
@@ -700,10 +772,11 @@ namespace TrueSync.Physics3D {
             TSVector cp = p - c;
             FP d5 = TSVector.Dot(ab, cp);
             FP d6 = TSVector.Dot(ac, cp);
-            if (d6 >= FP.Zero && d5 <= d6) {
-                result.ClosestPointOnSimplex = c;
-                result.UsedVertices.UsedVertexC = true;
-                result.SetBarycentricCoordinates(0, 0, 1, 0);
+            if (d6 >= FP.Zero && d5 <= d6)
+            {
+                result.closestPointOnSimplex = c;
+                result.usedVertices.UsedVertexC = true;
+                result.SetBarycentricCoordinates(FP.Zero, FP.Zero, FP.One, FP.Zero);
                 return true;//c; // barycentric coordinates (0,0,1)
             }
 
@@ -711,23 +784,26 @@ namespace TrueSync.Physics3D {
             FP vb = d5 * d2 - d1 * d6;
             if (vb <= FP.Zero && d2 >= FP.Zero && d6 <= FP.Zero) {
                 w = d2 / (d2 - d6);
-                result.ClosestPointOnSimplex = a + w * ac;
-                result.UsedVertices.UsedVertexA = true;
-                result.UsedVertices.UsedVertexC = true;
-                result.SetBarycentricCoordinates(1 - w, 0, w, 0);
+                result.closestPointOnSimplex = a + w * ac;
+                result.usedVertices.UsedVertexA = true;
+                result.usedVertices.UsedVertexC = true;
+                result.SetBarycentricCoordinates(FP.One - w, FP.Zero, w, FP.Zero);
                 return true;
                 //return a + w * ac; // barycentric coordinates (1-w,0,w)
             }
 
             // Check if P in edge region of BC, if so return projection of P onto BC
             FP va = d3 * d6 - d5 * d4;
-            if (va <= FP.Zero && (d4 - d3) >= FP.Zero && (d5 - d6) >= FP.Zero) {
-                w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+            FP d34 = d4 - d3;
+            FP d65 = d5 - d6;
+            if (va <= FP.Zero && d34 >= FP.Zero && d65 >= FP.Zero)
+            {
+                w = d34 / (d34 + d65);
 
-                result.ClosestPointOnSimplex = b + w * (c - b);
-                result.UsedVertices.UsedVertexB = true;
-                result.UsedVertices.UsedVertexC = true;
-                result.SetBarycentricCoordinates(0, 1 - w, w, 0);
+                result.closestPointOnSimplex = b + w * (c - b);
+                result.usedVertices.UsedVertexB = true;
+                result.usedVertices.UsedVertexC = true;
+                result.SetBarycentricCoordinates(FP.Zero, FP.One - w, w, FP.Zero);
                 return true;
                 // return b + w * (c - b); // barycentric coordinates (0,1-w,w)
             }
@@ -737,24 +813,26 @@ namespace TrueSync.Physics3D {
             v = vb * denom;
             w = vc * denom;
 
-            result.ClosestPointOnSimplex = a + ab * v + ac * w;
-            result.UsedVertices.UsedVertexA = true;
-            result.UsedVertices.UsedVertexB = true;
-            result.UsedVertices.UsedVertexC = true;
-            result.SetBarycentricCoordinates(1 - v - w, v, w, 0);
+            result.closestPointOnSimplex = a + ab * v + ac * w;
+            result.usedVertices.UsedVertexA = true;
+            result.usedVertices.UsedVertexB = true;
+            result.usedVertices.UsedVertexC = true;
+            result.SetBarycentricCoordinates(FP.One - v - w, v, w, FP.Zero);
 
             return true;
         }
 
         /// Test if point p and d lie on opposite sides of plane through abc
-        public int PointOutsideOfPlane(TSVector p, TSVector a, TSVector b, TSVector c, TSVector d) {
+        public int PointOutsideOfPlane(TSVector p, TSVector a, TSVector b, TSVector c, TSVector d)
+        {
             TSVector normal = TSVector.Cross(b - a, c - a);
 
             FP signp = TSVector.Dot(p - a, normal); // [AP AB AC]
             FP signd = TSVector.Dot(d - a, normal); // [AD AB AC]
 
             //if (CatchDegenerateTetrahedron)
-            if (signd * signd < (FP.EN8)) return -1;
+            if (signd * signd < (FP.EN8))
+                return -1;
 
             // Points on opposite sides if expression signs are opposite
             return signp * signd < FP.Zero ? 1 : 0;
@@ -765,20 +843,21 @@ namespace TrueSync.Physics3D {
             tempResult.Reset();
 
             // Start out assuming point inside all halfspaces, so closest to itself
-            finalResult.ClosestPointOnSimplex = p;
-            finalResult.UsedVertices.Reset();
-            finalResult.UsedVertices.UsedVertexA = true;
-            finalResult.UsedVertices.UsedVertexB = true;
-            finalResult.UsedVertices.UsedVertexC = true;
-            finalResult.UsedVertices.UsedVertexD = true;
+            finalResult.closestPointOnSimplex = p;
+            finalResult.usedVertices.Reset();
+            finalResult.usedVertices.UsedVertexA = true;
+            finalResult.usedVertices.UsedVertexB = true;
+            finalResult.usedVertices.UsedVertexC = true;
+            finalResult.usedVertices.UsedVertexD = true;
 
             int pointOutsideABC = PointOutsideOfPlane(p, a, b, c, d);
             int pointOutsideACD = PointOutsideOfPlane(p, a, c, d, b);
             int pointOutsideADB = PointOutsideOfPlane(p, a, d, b, c);
             int pointOutsideBDC = PointOutsideOfPlane(p, b, d, c, a);
 
-            if (pointOutsideABC < 0 || pointOutsideACD < 0 || pointOutsideADB < 0 || pointOutsideBDC < 0) {
-                finalResult.Degenerate = true;
+            if (pointOutsideABC < 0 || pointOutsideACD < 0 || pointOutsideADB < 0 || pointOutsideBDC < 0)
+            {
+                finalResult.degenerate = true;
                 return false;
             }
 
@@ -787,101 +866,109 @@ namespace TrueSync.Physics3D {
 
             FP bestSqDist = FP.MaxValue;
             // If point outside face abc then compute closest point on abc
-            if (pointOutsideABC != 0) {
+            if (pointOutsideABC != 0)
+            {
                 ClosestPtPointTriangle(p, a, b, c, ref tempResult);
-                TSVector q = tempResult.ClosestPointOnSimplex;
+                TSVector q = tempResult.closestPointOnSimplex;
 
-                FP sqDist = ((TSVector)(q - p)).sqrMagnitude;
+                FP sqDist = (q - p).sqrMagnitude;
                 // Update best closest point if (squared) distance is less than current best
-                if (sqDist < bestSqDist) {
+                if (sqDist < bestSqDist)
+                {
                     bestSqDist = sqDist;
-                    finalResult.ClosestPointOnSimplex = q;
+                    finalResult.closestPointOnSimplex = q;
                     //convert result bitmask!
-                    finalResult.UsedVertices.Reset();
-                    finalResult.UsedVertices.UsedVertexA = tempResult.UsedVertices.UsedVertexA;
-                    finalResult.UsedVertices.UsedVertexB = tempResult.UsedVertices.UsedVertexB;
-                    finalResult.UsedVertices.UsedVertexC = tempResult.UsedVertices.UsedVertexC;
+                    finalResult.usedVertices.Reset();
+                    finalResult.usedVertices.UsedVertexA = tempResult.usedVertices.UsedVertexA;
+                    finalResult.usedVertices.UsedVertexB = tempResult.usedVertices.UsedVertexB;
+                    finalResult.usedVertices.UsedVertexC = tempResult.usedVertices.UsedVertexC;
                     finalResult.SetBarycentricCoordinates(
-                            tempResult.BarycentricCoords[VertexA],
-                            tempResult.BarycentricCoords[VertexB],
-                            tempResult.BarycentricCoords[VertexC],
-                            0);
+                            tempResult.barycentricCoords[VertexA],
+                            tempResult.barycentricCoords[VertexB],
+                            tempResult.barycentricCoords[VertexC],
+                            FP.Zero);
                 }
             }
 
             // Repeat test for face acd
-            if (pointOutsideACD != 0) {
+            if (pointOutsideACD != 0)
+            {
                 ClosestPtPointTriangle(p, a, c, d, ref tempResult);
-                TSVector q = tempResult.ClosestPointOnSimplex;
+                TSVector q = tempResult.closestPointOnSimplex;
                 //convert result bitmask!
 
-                FP sqDist = ((TSVector)(q - p)).sqrMagnitude;
-                if (sqDist < bestSqDist) {
+                FP sqDist = (q - p).sqrMagnitude;
+                if (sqDist < bestSqDist)
+                {
                     bestSqDist = sqDist;
-                    finalResult.ClosestPointOnSimplex = q;
-                    finalResult.UsedVertices.Reset();
-                    finalResult.UsedVertices.UsedVertexA = tempResult.UsedVertices.UsedVertexA;
-                    finalResult.UsedVertices.UsedVertexC = tempResult.UsedVertices.UsedVertexB;
-                    finalResult.UsedVertices.UsedVertexD = tempResult.UsedVertices.UsedVertexC;
+                    finalResult.closestPointOnSimplex = q;
+                    finalResult.usedVertices.Reset();
+                    finalResult.usedVertices.UsedVertexA = tempResult.usedVertices.UsedVertexA;
+                    finalResult.usedVertices.UsedVertexC = tempResult.usedVertices.UsedVertexB;
+                    finalResult.usedVertices.UsedVertexD = tempResult.usedVertices.UsedVertexC;
                     finalResult.SetBarycentricCoordinates(
-                            tempResult.BarycentricCoords[VertexA],
-                            0,
-                            tempResult.BarycentricCoords[VertexB],
-                            tempResult.BarycentricCoords[VertexC]);
+                            tempResult.barycentricCoords[VertexA],
+                            FP.Zero,
+                            tempResult.barycentricCoords[VertexB],
+                            tempResult.barycentricCoords[VertexC]);
                 }
             }
             // Repeat test for face adb
 
-            if (pointOutsideADB != 0) {
+            if (pointOutsideADB != 0)
+            {
                 ClosestPtPointTriangle(p, a, d, b, ref tempResult);
-                TSVector q = tempResult.ClosestPointOnSimplex;
+                TSVector q = tempResult.closestPointOnSimplex;
                 //convert result bitmask!
 
-                FP sqDist = ((TSVector)(q - p)).sqrMagnitude;
-                if (sqDist < bestSqDist) {
+                FP sqDist = (q - p).sqrMagnitude;
+                if (sqDist < bestSqDist)
+                {
                     bestSqDist = sqDist;
-                    finalResult.ClosestPointOnSimplex = q;
-                    finalResult.UsedVertices.Reset();
-                    finalResult.UsedVertices.UsedVertexA = tempResult.UsedVertices.UsedVertexA;
-                    finalResult.UsedVertices.UsedVertexD = tempResult.UsedVertices.UsedVertexB;
-                    finalResult.UsedVertices.UsedVertexB = tempResult.UsedVertices.UsedVertexC;
+                    finalResult.closestPointOnSimplex = q;
+                    finalResult.usedVertices.Reset();
+                    finalResult.usedVertices.UsedVertexA = tempResult.usedVertices.UsedVertexA;
+                    finalResult.usedVertices.UsedVertexD = tempResult.usedVertices.UsedVertexB;
+                    finalResult.usedVertices.UsedVertexB = tempResult.usedVertices.UsedVertexC;
                     finalResult.SetBarycentricCoordinates(
-                            tempResult.BarycentricCoords[VertexA],
-                            tempResult.BarycentricCoords[VertexC],
-                            0,
-                            tempResult.BarycentricCoords[VertexB]);
+                            tempResult.barycentricCoords[VertexA],
+                            tempResult.barycentricCoords[VertexC],
+                            FP.Zero,
+                            tempResult.barycentricCoords[VertexB]);
 
                 }
             }
             // Repeat test for face bdc
 
-            if (pointOutsideBDC != 0) {
+            if (pointOutsideBDC != 0)
+            {
                 ClosestPtPointTriangle(p, b, d, c, ref tempResult);
-                TSVector q = tempResult.ClosestPointOnSimplex;
+                TSVector q = tempResult.closestPointOnSimplex;
                 //convert result bitmask!
-                FP sqDist = ((TSVector)(q - p)).sqrMagnitude;
-                if (sqDist < bestSqDist) {
+                FP sqDist = (q - p).sqrMagnitude;
+                if (sqDist < bestSqDist)
+                {
                     bestSqDist = sqDist;
-                    finalResult.ClosestPointOnSimplex = q;
-                    finalResult.UsedVertices.Reset();
-                    finalResult.UsedVertices.UsedVertexB = tempResult.UsedVertices.UsedVertexA;
-                    finalResult.UsedVertices.UsedVertexD = tempResult.UsedVertices.UsedVertexB;
-                    finalResult.UsedVertices.UsedVertexC = tempResult.UsedVertices.UsedVertexC;
+                    finalResult.closestPointOnSimplex = q;
+                    finalResult.usedVertices.Reset();
+                    finalResult.usedVertices.UsedVertexB = tempResult.usedVertices.UsedVertexA;
+                    finalResult.usedVertices.UsedVertexD = tempResult.usedVertices.UsedVertexB;
+                    finalResult.usedVertices.UsedVertexC = tempResult.usedVertices.UsedVertexC;
 
                     finalResult.SetBarycentricCoordinates(
-                            0,
-                            tempResult.BarycentricCoords[VertexA],
-                            tempResult.BarycentricCoords[VertexC],
-                            tempResult.BarycentricCoords[VertexB]);
+                            FP.Zero,
+                            tempResult.barycentricCoords[VertexA],
+                            tempResult.barycentricCoords[VertexC],
+                            tempResult.barycentricCoords[VertexB]);
                 }
             }
 
             //help! we ended up full !
 
-            if (finalResult.UsedVertices.UsedVertexA &&
-                finalResult.UsedVertices.UsedVertexB &&
-                finalResult.UsedVertices.UsedVertexC &&
-                finalResult.UsedVertices.UsedVertexD) {
+            if (finalResult.usedVertices.UsedVertexA &&
+                finalResult.usedVertices.UsedVertexB &&
+                finalResult.usedVertices.UsedVertexC &&
+                finalResult.usedVertices.UsedVertexD) {
                 return true;
             }
 
@@ -910,32 +997,27 @@ namespace TrueSync.Physics3D {
     }
 
     public class SubSimplexClosestResult {
-        private TSVector _closestPointOnSimplex;
+        public TSVector closestPointOnSimplex;
 
         //MASK for m_usedVertices
         //stores the simplex vertex-usage, using the MASK, 
         // if m_usedVertices & MASK then the related vertex is used
-        private UsageBitfield _usedVertices = new UsageBitfield();
-        private FP[] _barycentricCoords = new FP[4];
-        private bool _degenerate;
-
-        public TSVector ClosestPointOnSimplex { get { return _closestPointOnSimplex; } set { _closestPointOnSimplex = value; } }
-        public UsageBitfield UsedVertices { get { return _usedVertices; } set { _usedVertices = value; } }
-        public FP[] BarycentricCoords { get { return _barycentricCoords; } set { _barycentricCoords = value; } }
-        public bool Degenerate { get { return _degenerate; } set { _degenerate = value; } }
+        public UsageBitfield usedVertices = new UsageBitfield();
+        public FP[] barycentricCoords = new FP[4];
+        public bool degenerate;
 
         public void Reset() {
-            _degenerate = false;
+            degenerate = false;
             SetBarycentricCoordinates();
-            _usedVertices.Reset();
+            usedVertices.Reset();
         }
 
         public bool IsValid {
             get {
-                return (_barycentricCoords[0] >= FP.Zero) &&
-                        (_barycentricCoords[1] >= FP.Zero) &&
-                        (_barycentricCoords[2] >= FP.Zero) &&
-                        (_barycentricCoords[3] >= FP.Zero);
+                return (barycentricCoords[0] >= FP.Zero) &&
+                        (barycentricCoords[1] >= FP.Zero) &&
+                        (barycentricCoords[2] >= FP.Zero) &&
+                        (barycentricCoords[3] >= FP.Zero);
             }
         }
 
@@ -944,10 +1026,10 @@ namespace TrueSync.Physics3D {
         }
 
         public void SetBarycentricCoordinates(FP a, FP b, FP c, FP d) {
-            _barycentricCoords[0] = a;
-            _barycentricCoords[1] = b;
-            _barycentricCoords[2] = c;
-            _barycentricCoords[3] = d;
+            barycentricCoords[0] = a;
+            barycentricCoords[1] = b;
+            barycentricCoords[2] = c;
+            barycentricCoords[3] = d;
         }
     }
 
