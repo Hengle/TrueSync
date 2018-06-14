@@ -103,6 +103,41 @@ namespace TrueSync
         }
         #endregion
 
+        /// <summary>
+        /// Gets or sets the component at the specified index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <value>The component at <paramref name="index"/>.</value>
+        /// <remarks>
+        /// The index is zero based: x = vector[0], y = vector[1], z = vector[2].
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The <paramref name="index"/> is out of range.
+        /// </exception>
+        public FP this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    case 2: return z;
+                    default: throw new ArgumentOutOfRangeException("index", "The index is out of range. Allowed values are 0, 1, or 2.");
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    case 2: z = value; break;
+                    default: throw new ArgumentOutOfRangeException("index", "The index is out of range. Allowed values are 0, 1, or 2.");
+                }
+            }
+        }
+
         public static TSVector Abs(TSVector other) {
             return new TSVector(FP.Abs(other.x), FP.Abs(other.y), FP.Abs(other.z));
         }

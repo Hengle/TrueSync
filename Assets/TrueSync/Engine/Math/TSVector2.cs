@@ -127,6 +127,39 @@ namespace TrueSync {
 
         #region Public Methods
 
+        /// <summary>
+        /// Gets or sets the component at the specified index.
+        /// </summary>
+        /// <param name="index">The index.</param>
+        /// <value>The component at <paramref name="index"/>.</value>
+        /// <remarks>
+        /// The index is zero based: x = vector[0], y = vector[1].
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The <paramref name="index"/> is out of range.
+        /// </exception>
+        public FP this[int index]
+        {
+            get
+            {
+                switch (index)
+                {
+                    case 0: return x;
+                    case 1: return y;
+                    default: throw new ArgumentOutOfRangeException("index", "The index is out of range. Allowed values are 0 or 1.");
+                }
+            }
+            set
+            {
+                switch (index)
+                {
+                    case 0: x = value; break;
+                    case 1: y = value; break;
+                    default: throw new ArgumentOutOfRangeException("index", "The index is out of range. Allowed values are 0 or 1");
+                }
+            }
+        }
+
         public static void Reflect(ref TSVector2 vector, ref TSVector2 normal, out TSVector2 result)
         {
             FP dot = Dot(vector, normal);
