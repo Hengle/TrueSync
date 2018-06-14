@@ -37,7 +37,15 @@ namespace TrueSync.Physics3D
             {
                 //Get the unit direction from the first sphere's center to the second sphere's center.
                 TSVector.Subtract(ref center2, ref center1, out normal);
-                normal = normal.normalized;
+                if (normal.sqrMagnitude < TSMath.Epsilon)
+                {
+                    // Spheres are on the same position, we can choose any normal vector.
+                    // Possibly it would be better to consider the object movement (velocities), but 
+                    // it is not important since this case should be VERY rare.
+                    normal = TSVector.forward;
+                }
+                else
+                    normal = normal.normalized;
 
                 FP r1 = sphere1.radius;
                 FP r2 = sphere2.radius;
