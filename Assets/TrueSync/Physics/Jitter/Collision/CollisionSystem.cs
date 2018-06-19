@@ -325,78 +325,78 @@ namespace TrueSync.Physics3D {
                         SphereSpherePair.pool.GiveBack(sphereSpherePair);
                         break;
 
-                    case ShapeType.Box | ShapeType.Sphere:
-                        BoxSpherePair boxSpherePair = BoxSpherePair.pool.GetNew();
+                    //case ShapeType.Box | ShapeType.Sphere:
+                    //    BoxSpherePair boxSpherePair = BoxSpherePair.pool.GetNew();
 
-                        if (body1.Shape is BoxShape)
-                        {
-                            b1 = body1;
-                            b2 = body2;
-                        }
-                        else
-                        {
-                            b1 = body2;
-                            b2 = body1;
-                        }
-                        boxSpherePair.Shape1 = b1.Shape;
-                        boxSpherePair.Shape2 = b2.Shape;
+                    //    if (body1.Shape is BoxShape)
+                    //    {
+                    //        b1 = body1;
+                    //        b2 = body2;
+                    //    }
+                    //    else
+                    //    {
+                    //        b1 = body2;
+                    //        b2 = body1;
+                    //    }
+                    //    boxSpherePair.Shape1 = b1.Shape;
+                    //    boxSpherePair.Shape2 = b2.Shape;
 
-                        if (boxSpherePair.IsColliding(ref b1.orientation, ref b2.orientation, ref b1.position, ref b2.position,
-                            out point, out point1, out point2, out normal, out penetration))
-                        {
-                            RaiseCollisionDetected(b1, b2, ref point1, ref point2, ref normal, penetration);
-                        }
-                        BoxSpherePair.pool.GiveBack(boxSpherePair);
-                        break;
+                    //    if (boxSpherePair.IsColliding(ref b1.orientation, ref b2.orientation, ref b1.position, ref b2.position,
+                    //        out point, out point1, out point2, out normal, out penetration))
+                    //    {
+                    //        RaiseCollisionDetected(b1, b2, ref point1, ref point2, ref normal, penetration);
+                    //    }
+                    //    BoxSpherePair.pool.GiveBack(boxSpherePair);
+                    //    break;
 
-                    case ShapeType.Capusle | ShapeType.Capusle:
-                        CapsuleCapsulePair capsuleCapsulePair = CapsuleCapsulePair.pool.GetNew();
-                        capsuleCapsulePair.Shape1 = body1.Shape;
-                        capsuleCapsulePair.Shape2 = body2.Shape;
+                    //case ShapeType.Capusle | ShapeType.Capusle:
+                    //    CapsuleCapsulePair capsuleCapsulePair = CapsuleCapsulePair.pool.GetNew();
+                    //    capsuleCapsulePair.Shape1 = body1.Shape;
+                    //    capsuleCapsulePair.Shape2 = body2.Shape;
 
-                        if (capsuleCapsulePair.IsColliding(ref body1.orientation, ref body2.orientation, ref body1.position, ref body2.position,
-                            out point, out point1, out point2, out normal, out penetration))
-                        {
-                            RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
-                        }
-                        CapsuleCapsulePair.pool.GiveBack(capsuleCapsulePair);
-                        break;
+                    //    if (capsuleCapsulePair.IsColliding(ref body1.orientation, ref body2.orientation, ref body1.position, ref body2.position,
+                    //        out point, out point1, out point2, out normal, out penetration))
+                    //    {
+                    //        RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
+                    //    }
+                    //    CapsuleCapsulePair.pool.GiveBack(capsuleCapsulePair);
+                    //    break;
 
-                    case ShapeType.Capusle | ShapeType.Sphere:
-                        CapsuleSpherePair capsuleSpherePair = CapsuleSpherePair.pool.GetNew();
+                    //case ShapeType.Capusle | ShapeType.Sphere:
+                    //    CapsuleSpherePair capsuleSpherePair = CapsuleSpherePair.pool.GetNew();
 
-                        if (body1.Shape is CapsuleShape)
-                        {
-                            b1 = body1;
-                            b2 = body2;
-                        }
-                        else
-                        {
-                            b1 = body2;
-                            b2 = body1;
-                        }
-                        capsuleSpherePair.Shape1 = b1.Shape;
-                        capsuleSpherePair.Shape2 = b2.Shape;
+                    //    if (body1.Shape is CapsuleShape)
+                    //    {
+                    //        b1 = body1;
+                    //        b2 = body2;
+                    //    }
+                    //    else
+                    //    {
+                    //        b1 = body2;
+                    //        b2 = body1;
+                    //    }
+                    //    capsuleSpherePair.Shape1 = b1.Shape;
+                    //    capsuleSpherePair.Shape2 = b2.Shape;
 
-                        if (capsuleSpherePair.IsColliding(ref b1.orientation, ref b2.orientation, ref b1.position, ref b2.position,
-                            out point, out point1, out point2, out normal, out penetration))
-                        {
-                            RaiseCollisionDetected(b1, b2, ref point1, ref point2, ref normal, penetration);
-                        }
-                        CapsuleSpherePair.pool.GiveBack(capsuleSpherePair);
-                        break;
-                    case ShapeType.Box | ShapeType.Box:
-                        //BoxBoxPair boxBoxPair = BoxBoxPair.pool.GetNew();
-                        //boxBoxPair.Shape1 = body1.Shape;
-                        //boxBoxPair.Shape2 = body2.Shape;
+                    //    if (capsuleSpherePair.IsColliding(ref b1.orientation, ref b2.orientation, ref b1.position, ref b2.position,
+                    //        out point, out point1, out point2, out normal, out penetration))
+                    //    {
+                    //        RaiseCollisionDetected(b1, b2, ref point1, ref point2, ref normal, penetration);
+                    //    }
+                    //    CapsuleSpherePair.pool.GiveBack(capsuleSpherePair);
+                    //    break;
+                    //case ShapeType.Box | ShapeType.Box:
+                    //    BoxBoxPair boxBoxPair = BoxBoxPair.pool.GetNew();
+                    //    boxBoxPair.Shape1 = body1.Shape;
+                    //    boxBoxPair.Shape2 = body2.Shape;
 
-                        //if (boxBoxPair.IsColliding(ref body1.orientation, ref body2.orientation, ref body1.position, ref body2.position,
-                        //    out point, out point1, out point2, out normal, out penetration))
-                        //{
-                        //    RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
-                        //}
-                        //BoxBoxPair.pool.GiveBack(boxBoxPair);
-                        //break;
+                    //    if (boxBoxPair.IsColliding(ref body1.orientation, ref body2.orientation, ref body1.position, ref body2.position,
+                    //        out point, out point1, out point2, out normal, out penetration))
+                    //    {
+                    //        RaiseCollisionDetected(body1, body2, ref point1, ref point2, ref normal, penetration);
+                    //    }
+                    //    BoxBoxPair.pool.GiveBack(boxBoxPair);
+                    //    break;
                     default:
                         if (XenoCollide.Detect(body1.Shape, body2.Shape, ref body1.orientation,
                             ref body2.orientation, ref body1.position, ref body2.position,
