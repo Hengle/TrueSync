@@ -370,24 +370,25 @@ namespace TrueSync
         /// <param name="result">The inverted JMatrix.</param>
         public static void Inverse(ref TSMatrix matrix, out TSMatrix result)
         {
-			FP det = 1024 * matrix.M11 * matrix.M22 * matrix.M33 -
-				1024 * matrix.M11 * matrix.M23 * matrix.M32 -
-				1024 * matrix.M12 * matrix.M21 * matrix.M33 +
-				1024 * matrix.M12 * matrix.M23 * matrix.M31 +
-				1024 * matrix.M13 * matrix.M21 * matrix.M32 -
-				1024 * matrix.M13 * matrix.M22 * matrix.M31;
+			FP det = 
+                matrix.M11 * matrix.M22 * matrix.M33 -
+				matrix.M11 * matrix.M23 * matrix.M32 -
+				matrix.M12 * matrix.M21 * matrix.M33 +
+				matrix.M12 * matrix.M23 * matrix.M31 +
+				matrix.M13 * matrix.M21 * matrix.M32 -
+				matrix.M13 * matrix.M22 * matrix.M31;
 
-			FP num11 =1024* matrix.M22 * matrix.M33 - 1024*matrix.M23 * matrix.M32;
-			FP num12 =1024* matrix.M13 * matrix.M32 -1024* matrix.M12 * matrix.M33;
-			FP num13 =1024* matrix.M12 * matrix.M23 -1024* matrix.M22 * matrix.M13;
-
-			FP num21 =1024* matrix.M23 * matrix.M31 -1024* matrix.M33 * matrix.M21;
-			FP num22 =1024* matrix.M11 * matrix.M33 -1024* matrix.M31 * matrix.M13;
-			FP num23 =1024* matrix.M13 * matrix.M21 -1024* matrix.M23 * matrix.M11;
-
-			FP num31 =1024* matrix.M21 * matrix.M32 - 1024* matrix.M31 * matrix.M22;
-			FP num32 =1024* matrix.M12 * matrix.M31 - 1024* matrix.M32 * matrix.M11;
-			FP num33 =1024* matrix.M11 * matrix.M22 - 1024*matrix.M21 * matrix.M12;
+			FP num11 = matrix.M22 * matrix.M33 - matrix.M23 * matrix.M32;
+			FP num12 = matrix.M13 * matrix.M32 - matrix.M12 * matrix.M33;
+			FP num13 = matrix.M12 * matrix.M23 - matrix.M22 * matrix.M13;
+                       
+			FP num21 = matrix.M23 * matrix.M31 - matrix.M33 * matrix.M21;
+			FP num22 = matrix.M11 * matrix.M33 - matrix.M31 * matrix.M13;
+			FP num23 = matrix.M13 * matrix.M21 - matrix.M23 * matrix.M11;
+                       
+			FP num31 = matrix.M21 * matrix.M32 - matrix.M31 * matrix.M22;
+			FP num32 = matrix.M12 * matrix.M31 - matrix.M32 * matrix.M11;
+			FP num33 = matrix.M11 * matrix.M22 - matrix.M21 * matrix.M12;
 
 			if(det == 0){
 				result.M11 = FP.PositiveInfinity;
