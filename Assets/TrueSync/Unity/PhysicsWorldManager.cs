@@ -14,14 +14,15 @@ namespace TrueSync {
 
         private World world;
 
-        Dictionary<IBody, GameObject> gameObjectMap;
+        private Dictionary<IBody, GameObject> gameObjectMap;
 
-        Dictionary<RigidBody, Dictionary<RigidBody, TSCollision>> collisionInfo;
+        private Dictionary<RigidBody, Dictionary<RigidBody, TSCollision>> collisionInfo;
 
-        Dictionary<IBody, HashList<TrueSyncBehaviour>> behavioursMap;
+        private Dictionary<IBody, HashList<TrueSyncBehaviour>> behavioursMap;
 
-        Dictionary<IBody, TSTransform> transformMap;
+        private Dictionary<IBody, TSTransform> transformMap;
 
+        private TSRaycastHit hit;
         /**
          *  @brief Property access to simulated gravity.
          **/
@@ -51,6 +52,7 @@ namespace TrueSync {
             collisionInfo = new Dictionary<RigidBody, Dictionary<RigidBody, TSCollision>>();
             behavioursMap = new Dictionary<IBody, HashList<TrueSyncBehaviour>>();
             transformMap = new Dictionary<IBody, TSTransform>();
+            hit = new TSRaycastHit();
 
             CollisionSystemPersistentSAP collisionSystem = new CollisionSystemPersistentSAP();
             collisionSystem.EnableSpeculativeContacts = SpeculativeContacts;
@@ -189,7 +191,8 @@ namespace TrueSync {
                     TSTransform transformComponent = transformMap[hitBody];
                     TSRigidBody bodyComponent = transformComponent.rb;
                     TSCollider colliderComponent = transformComponent.tsCollider;
-                    return new TSRaycastHit(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, ray.direction, hitFraction);
+                    hit.Init(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, ray.direction, hitFraction);
+                    return hit;
                 }
             } else {
                 direction *= maxDistance;
@@ -198,7 +201,8 @@ namespace TrueSync {
                     TSTransform transformComponent = transformMap[hitBody];
                     TSRigidBody bodyComponent = transformComponent.rb;
                     TSCollider colliderComponent = transformComponent.tsCollider;
-                    return new TSRaycastHit(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, direction, hitFraction);
+                    hit.Init(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, ray.direction, hitFraction);
+                    return hit;
                 }
             }
             return null;
@@ -220,7 +224,8 @@ namespace TrueSync {
                 TSTransform transformComponent = transformMap[hitBody];
                 TSRigidBody bodyComponent = transformComponent.rb;
                 TSCollider colliderComponent = transformComponent.tsCollider;
-                return new TSRaycastHit(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, direction, hitFraction);
+                hit.Init(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, ray.direction, hitFraction);
+                return hit;
             }
 
             return null;
@@ -335,15 +340,15 @@ namespace TrueSync {
          *  
          *  @param rigidBody Instance of a {@link RigidBody}
          **/
-        public GameObject GetGameObject(IBody rigidBody) {
-            if (!gameObjectMap.ContainsKey(rigidBody)) {
-                return null;
-            }
-
-            return gameObjectMap[rigidBody];
+        public GameObject GetGameObject(IBody rigidBody)
+        {
+            GameObject obj = null;
+            gameObjectMap.TryGetValue(rigidBody, out obj);
+            return obj;
         }
 
-        public int GetBodyLayer(IBody body) {
+        public int GetBodyLayer(IBody body)
+        {
             GameObject go = GetGameObject(body);
             if (go == null) {
                 return -1;

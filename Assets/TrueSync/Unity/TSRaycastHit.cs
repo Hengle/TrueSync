@@ -26,6 +26,16 @@ namespace TrueSync
 			this.point = origin + direction * fraction;
 			this.distance = fraction * direction.magnitude;
 		}
+
+        public void Init(TSRigidBody rigidbody, TSCollider collider, TSTransform transform, TSVector normal, TSVector origin, TSVector direction, FP fraction)
+        {
+            this.rigidbody = rigidbody;
+            this.collider = collider;
+            this.transform = transform;
+            this.normal = normal;
+            this.point = origin + direction * fraction;
+            this.distance = fraction * direction.magnitude;
+        }
 	}
 }
 
