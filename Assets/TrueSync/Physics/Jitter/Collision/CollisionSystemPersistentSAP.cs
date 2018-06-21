@@ -22,50 +22,51 @@ using System;
 using System.Collections.Generic;
 #endregion
 
-namespace TrueSync.Physics3D {
+namespace TrueSync.Physics3D
+{
 
-	#region private class SweepPoint
-	public class SweepPoint
-	{
-		public IBroadphaseEntity Body;
-		public bool Begin;
-		public int Axis;
-
-		public SweepPoint(IBroadphaseEntity body, bool begin, int axis)
-		{
-			this.Body = body;
-			this.Begin = begin;
-			this.Axis = axis;
-		}
-
-		public FP Value
-		{
-			get
-			{
-				if (Begin)
-				{
-					if (Axis == 0) return Body.BoundingBox.min.x;
-					else if (Axis == 1) return Body.BoundingBox.min.y;
-					else return Body.BoundingBox.min.z;
-				}
-				else
-				{
-					if (Axis == 0) return Body.BoundingBox.max.x;
-					else if (Axis == 1) return Body.BoundingBox.max.y;
-					else return Body.BoundingBox.max.z;
-				}
-			}
-		}
-
-
-	}
-	#endregion
-
-	#region private struct OverlapPair
-	public struct OverlapPair : IComparable, ResourcePoolItem
+    #region private class SweepPoint
+    public class SweepPoint
     {
-		// internal values for faster access within the engine
-		public IBroadphaseEntity Entity1, Entity2;
+        public IBroadphaseEntity Body;
+        public bool Begin;
+        public int Axis;
+
+        public SweepPoint(IBroadphaseEntity body, bool begin, int axis)
+        {
+            this.Body = body;
+            this.Begin = begin;
+            this.Axis = axis;
+        }
+
+        public FP Value
+        {
+            get
+            {
+                if (Begin)
+                {
+                    if (Axis == 0) return Body.BoundingBox.min.x;
+                    else if (Axis == 1) return Body.BoundingBox.min.y;
+                    else return Body.BoundingBox.min.z;
+                }
+                else
+                {
+                    if (Axis == 0) return Body.BoundingBox.max.x;
+                    else if (Axis == 1) return Body.BoundingBox.max.y;
+                    else return Body.BoundingBox.max.z;
+                }
+            }
+        }
+
+
+    }
+    #endregion
+
+    #region private struct OverlapPair
+    public struct OverlapPair : IComparable, ResourcePoolItem
+    {
+        // internal values for faster access within the engine
+        public IBroadphaseEntity Entity1, Entity2;
 
         /// <summary>
         /// Initializes a new instance of the BodyPair class.
@@ -73,70 +74,76 @@ namespace TrueSync.Physics3D {
         /// <param name="entity1"></param>
         /// <param name="entity2"></param>
         public OverlapPair(IBroadphaseEntity entity1, IBroadphaseEntity entity2)
-		{
-			this.Entity1 = entity1;
-			this.Entity2 = entity2;
-		}
+        {
+            this.Entity1 = entity1;
+            this.Entity2 = entity2;
+        }
 
-		/// <summary>
-		/// Don't call this, while the key is used in the arbitermap.
-		/// It changes the hashcode of this object.
-		/// </summary>
-		/// <param name="entity1">The first body.</param>
-		/// <param name="entity2">The second body.</param>
-		internal void SetBodies(IBroadphaseEntity entity1, IBroadphaseEntity entity2)
-		{
-			this.Entity1 = entity1;
-			this.Entity2 = entity2;
-		}
+        /// <summary>
+        /// Don't call this, while the key is used in the arbitermap.
+        /// It changes the hashcode of this object.
+        /// </summary>
+        /// <param name="entity1">The first body.</param>
+        /// <param name="entity2">The second body.</param>
+        internal void SetBodies(IBroadphaseEntity entity1, IBroadphaseEntity entity2)
+        {
+            this.Entity1 = entity1;
+            this.Entity2 = entity2;
+        }
 
-		/// <summary>
-		/// Checks if two objects are equal.
-		/// </summary>
-		/// <param name="obj">The object to check against.</param>
-		/// <returns>Returns true if they are equal, otherwise false.</returns>
-		public override bool Equals(object obj)
-		{
-			OverlapPair other = (OverlapPair)obj;
-			return (other.Entity1.Equals(Entity1) && other.Entity2.Equals(Entity2) ||
-				other.Entity1.Equals(Entity2) && other.Entity2.Equals(Entity1));
-		}
+        /// <summary>
+        /// Checks if two objects are equal.
+        /// </summary>
+        /// <param name="obj">The object to check against.</param>
+        /// <returns>Returns true if they are equal, otherwise false.</returns>
+        public override bool Equals(object obj)
+        {
+            OverlapPair other = (OverlapPair)obj;
+            return (other.Entity1.Equals(Entity1) && other.Entity2.Equals(Entity2) ||
+                other.Entity1.Equals(Entity2) && other.Entity2.Equals(Entity1));
+        }
 
-		/// <summary>
-		/// Returns the hashcode of the BodyPair.
-		/// The hashcode is the same if an BodyPair contains the same bodies.
-		/// </summary>
-		/// <returns></returns>
-		public override int GetHashCode()
-		{
-			return Entity1.GetHashCode() + Entity2.GetHashCode();
-		}
+        /// <summary>
+        /// Returns the hashcode of the BodyPair.
+        /// The hashcode is the same if an BodyPair contains the same bodies.
+        /// </summary>
+        /// <returns></returns>
+        public override int GetHashCode()
+        {
+            return Entity1.GetHashCode() + Entity2.GetHashCode();
+        }
 
-		public int CompareTo(object obj) {
-			if (obj is OverlapPair) {
-				long a = ((OverlapPair)obj).GetHashCode ();
-				long b = GetHashCode ();
+        public int CompareTo(object obj)
+        {
+            if (obj is OverlapPair)
+            {
+                long a = ((OverlapPair)obj).GetHashCode();
+                long b = GetHashCode();
 
-				long diff = a - b;
-				if (diff < 0) {
-					return 1;
-				} else if (diff > 0) {
-					return -1;
-				}
-			}
+                long diff = a - b;
+                if (diff < 0)
+                {
+                    return 1;
+                }
+                else if (diff > 0)
+                {
+                    return -1;
+                }
+            }
 
-			return 0;
-		}
+            return 0;
+        }
 
         public void CleanUp()
         {
             this.Entity1 = null;
             this.Entity2 = null;
         }
-	}
+    }
     #endregion
 
-    public class OverlapPairContact : IComparable {
+    public class OverlapPairContact : IComparable
+    {
 
         // internal values for faster access within the engine
         public IBroadphaseEntity Entity1, Entity2;
@@ -148,7 +155,8 @@ namespace TrueSync.Physics3D {
         /// </summary>
         /// <param name="entity1"></param>
         /// <param name="entity2"></param>
-        public OverlapPairContact(IBroadphaseEntity entity1, IBroadphaseEntity entity2) {
+        public OverlapPairContact(IBroadphaseEntity entity1, IBroadphaseEntity entity2)
+        {
             this.Entity1 = entity1;
             this.Entity2 = entity2;
         }
@@ -159,7 +167,8 @@ namespace TrueSync.Physics3D {
         /// </summary>
         /// <param name="entity1">The first body.</param>
         /// <param name="entity2">The second body.</param>
-        internal void SetBodies(IBroadphaseEntity entity1, IBroadphaseEntity entity2) {
+        internal void SetBodies(IBroadphaseEntity entity1, IBroadphaseEntity entity2)
+        {
             this.Entity1 = entity1;
             this.Entity2 = entity2;
         }
@@ -169,7 +178,8 @@ namespace TrueSync.Physics3D {
         /// </summary>
         /// <param name="obj">The object to check against.</param>
         /// <returns>Returns true if they are equal, otherwise false.</returns>
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             OverlapPairContact other = (OverlapPairContact)obj;
             return (other.Entity1.Equals(Entity1) && other.Entity2.Equals(Entity2) ||
                 other.Entity1.Equals(Entity2) && other.Entity2.Equals(Entity1));
@@ -180,19 +190,25 @@ namespace TrueSync.Physics3D {
         /// The hashcode is the same if an BodyPair contains the same bodies.
         /// </summary>
         /// <returns></returns>
-        public override int GetHashCode() {
+        public override int GetHashCode()
+        {
             return Entity1.GetHashCode() + Entity2.GetHashCode();
         }
 
-        public int CompareTo(object obj) {
-            if (obj is OverlapPairContact) {
+        public int CompareTo(object obj)
+        {
+            if (obj is OverlapPairContact)
+            {
                 long a = ((OverlapPairContact)obj).GetHashCode();
                 long b = GetHashCode();
 
                 long diff = a - b;
-                if (diff < 0) {
+                if (diff < 0)
+                {
                     return 1;
-                } else if (diff > 0) {
+                }
+                else if (diff > 0)
+                {
                     return -1;
                 }
             }
@@ -213,11 +229,11 @@ namespace TrueSync.Physics3D {
         // not needed anymore
         public List<IBroadphaseEntity> bodyList = new List<IBroadphaseEntity>();
 
-		public List<SweepPoint> axis1 = new List<SweepPoint>();
-		public List<SweepPoint> axis2 = new List<SweepPoint>();
-		public List<SweepPoint> axis3 = new List<SweepPoint>();
+        public List<SweepPoint> axis1 = new List<SweepPoint>();
+        public List<SweepPoint> axis2 = new List<SweepPoint>();
+        public List<SweepPoint> axis3 = new List<SweepPoint>();
 
-		public HashList<OverlapPair> fullOverlaps = new HashList<OverlapPair>();
+        public HashList<OverlapPair> fullOverlaps = new HashList<OverlapPair>();
 
         Action<object> sortCallback;
 
@@ -240,7 +256,7 @@ namespace TrueSync.Physics3D {
                 return 0;
         }
 
-		public List<IBroadphaseEntity> activeList = new List<IBroadphaseEntity>();
+        public List<IBroadphaseEntity> activeList = new List<IBroadphaseEntity>();
         private void DirtySortAxis(List<SweepPoint> axis)
         {
             axis.Sort(QuickSort);
@@ -254,7 +270,7 @@ namespace TrueSync.Physics3D {
                 {
                     foreach (IBroadphaseEntity body in activeList)
                     {
-                        if (CheckBoundingBoxes(body,keyelement.Body))
+                        if (CheckBoundingBoxes(body, keyelement.Body))
                         {
                             OverlapPair pair;
                             pair.Entity1 = body;
@@ -374,8 +390,9 @@ namespace TrueSync.Physics3D {
                 }
             }
 
-            foreach (var pair in fullOverlaps)
+            for (int index = 0, length = fullOverlaps.Count; index < length; index++)
             {
+                OverlapPair pair = fullOverlaps[index];
                 if (pair.Entity1 == body || pair.Entity2 == body)
                     deprecated.Push(pair);
             }
@@ -409,15 +426,17 @@ namespace TrueSync.Physics3D {
             }
 
             addCounter = 0;
-            foreach (OverlapPair key in fullOverlaps)
+            for (int index = 0, length = fullOverlaps.Count; index < length; index++)
             {
-                if (this.CheckBothStaticNonKinematic(key.Entity1, key.Entity2)){
-					continue;
-				}
-
-                if (base.RaisePassedBroadphase(key.Entity1, key.Entity2))
+                OverlapPair pair = fullOverlaps[index];
+                if (this.CheckBothStaticNonKinematic(pair.Entity1, pair.Entity2))
                 {
-                    Detect(key.Entity1, key.Entity2);
+                    continue;
+                }
+
+                if (base.RaisePassedBroadphase(pair.Entity1, pair.Entity2))
+                {
+                    Detect(pair.Entity1, pair.Entity2);
                 }
             }
 
@@ -539,7 +558,7 @@ namespace TrueSync.Physics3D {
         {
             body = null; normal = TSVector.zero; fraction = FP.MaxValue;
 
-            TSVector tempNormal;FP tempFraction;
+            TSVector tempNormal; FP tempFraction;
             bool result = false;
 
             // TODO: This can be done better in CollisionSystemPersistenSAP
@@ -599,8 +618,8 @@ namespace TrueSync.Physics3D {
             if (body.Shape is Multishape)
             {
                 Multishape ms = (body.Shape as Multishape).RequestWorkingClone();
-                
-                TSVector tempNormal;FP tempFraction;
+
+                TSVector tempNormal; FP tempFraction;
                 bool multiShapeCollides = false;
 
                 TSVector transformedOrigin; TSVector.Subtract(ref rayOrigin, ref body.position, out transformedOrigin);
