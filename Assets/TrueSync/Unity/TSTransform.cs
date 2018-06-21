@@ -496,7 +496,8 @@ namespace TrueSync {
 
         private bool initialized = false;
 
-		private TSRigidBody rb;
+        [HideInInspector]
+        public TSRigidBody rb;
 
         public void Start() {
             if (!Application.isPlaying) {

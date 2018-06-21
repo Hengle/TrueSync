@@ -20,6 +20,8 @@ namespace TrueSync {
 
         Dictionary<IBody, HashList<TrueSyncBehaviour>> behavioursMap;
 
+        Dictionary<IBody, TSTransform> transformMap;
+
         /**
          *  @brief Property access to simulated gravity.
          **/
@@ -48,6 +50,7 @@ namespace TrueSync {
             gameObjectMap = new Dictionary<IBody, GameObject>();
             collisionInfo = new Dictionary<RigidBody, Dictionary<RigidBody, TSCollision>>();
             behavioursMap = new Dictionary<IBody, HashList<TrueSyncBehaviour>>();
+            transformMap = new Dictionary<IBody, TSTransform>();
 
             CollisionSystemPersistentSAP collisionSystem = new CollisionSystemPersistentSAP();
             collisionSystem.EnableSpeculativeContacts = SpeculativeContacts;
@@ -92,7 +95,7 @@ namespace TrueSync {
             List<TSCollider> sortedBodies = new List<TSCollider>(bodies);
             sortedBodies.Sort(UnityUtils.bodyComparer);
 
-            for (int i = 0; i < sortedBodies.Count; i++) {
+            for (int i = 0, length = sortedBodies.Count; i < length; i++) {
                 AddBody(sortedBodies[i]);
             }
         }
@@ -115,7 +118,7 @@ namespace TrueSync {
                 return;
             }
 
-            TSRigidBody tsRB = tsCollider.GetComponent<TSRigidBody>();
+            TSRigidBody tsRB = tsCollider.tsTransform.rb; // tsCollider.GetComponent<TSRigidBody>();
             TSRigidBodyConstraints constraints = tsRB != null ? tsRB.constraints : TSRigidBodyConstraints.None;
 
             tsCollider.Initialize();
@@ -131,9 +134,11 @@ namespace TrueSync {
             }
             behavioursMap[tsCollider._body] = behaviours;
 
+            transformMap[tsCollider._body] = tsCollider.tsTransform;
+
             if (tsCollider.gameObject.transform.parent != null && tsCollider.gameObject.transform.parent.GetComponentInParent<TSCollider>() != null) {
                 TSCollider parentCollider = tsCollider.gameObject.transform.parent.GetComponentInParent<TSCollider>();
-				world.AddConstraint(new ConstraintHierarchy(parentCollider.Body, tsCollider._body, (tsCollider.GetComponent<TSTransform>().position + tsCollider.ScaledCenter) - (parentCollider.GetComponent<TSTransform>().position + parentCollider.ScaledCenter)));
+				world.AddConstraint(new ConstraintHierarchy(parentCollider.Body, tsCollider._body, (tsCollider.tsTransform.position + tsCollider.ScaledCenter) - (parentCollider.tsTransform.position + parentCollider.ScaledCenter)));
             }
 
             tsCollider._body.FreezeConstraints = constraints;
@@ -181,18 +186,18 @@ namespace TrueSync {
             if (Raycast(origin, direction, callback, out hitBody, out hitNormal, out hitFraction)) {
                 if (hitFraction <= maxDistance) {
                     GameObject other = PhysicsManager.instance.GetGameObject(hitBody);
-                    TSRigidBody bodyComponent = other.GetComponent<TSRigidBody>();
-                    TSCollider colliderComponent = other.GetComponent<TSCollider>();
-                    TSTransform transformComponent = other.GetComponent<TSTransform>();
+                    TSTransform transformComponent = transformMap[hitBody];
+                    TSRigidBody bodyComponent = transformComponent.rb;
+                    TSCollider colliderComponent = transformComponent.tsCollider;
                     return new TSRaycastHit(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, ray.direction, hitFraction);
                 }
             } else {
                 direction *= maxDistance;
                 if (Raycast(origin, direction, callback, out hitBody, out hitNormal, out hitFraction)) {
                     GameObject other = PhysicsManager.instance.GetGameObject(hitBody);
-                    TSRigidBody bodyComponent = other.GetComponent<TSRigidBody>();
-                    TSCollider colliderComponent = other.GetComponent<TSCollider>();
-                    TSTransform transformComponent = other.GetComponent<TSTransform>();
+                    TSTransform transformComponent = transformMap[hitBody];
+                    TSRigidBody bodyComponent = transformComponent.rb;
+                    TSCollider colliderComponent = transformComponent.tsCollider;
                     return new TSRaycastHit(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, direction, hitFraction);
                 }
             }
@@ -212,9 +217,9 @@ namespace TrueSync {
             if (Raycast(origin, direction, callback, layerMask, out hitBody, out hitNormal, out hitFraction))
             {
                 GameObject other = PhysicsManager.instance.GetGameObject(hitBody);
-                TSRigidBody bodyComponent = other.GetComponent<TSRigidBody>();
-                TSCollider colliderComponent = other.GetComponent<TSCollider>();
-                TSTransform transformComponent = other.GetComponent<TSTransform>();
+                TSTransform transformComponent = transformMap[hitBody];
+                TSRigidBody bodyComponent = transformComponent.rb;
+                TSCollider colliderComponent = transformComponent.tsCollider;
                 return new TSRaycastHit(bodyComponent, colliderComponent, transformComponent, hitNormal, ray.origin, direction, hitFraction);
             }
 
