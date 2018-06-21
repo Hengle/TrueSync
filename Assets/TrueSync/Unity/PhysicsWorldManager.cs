@@ -151,8 +151,8 @@ namespace TrueSync {
 
             gameObjectMap.Remove(iBody);
             behavioursMap.Remove(iBody);
-
-            // TODO: remove iBody from collisioninfo
+            transformMap.Remove(iBody);
+            collisionInfo.Remove(iBody as RigidBody);
         }
 
         public void OnRemoveBody(System.Action<IBody> OnRemoveBody){
