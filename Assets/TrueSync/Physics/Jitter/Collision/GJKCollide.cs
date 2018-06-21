@@ -651,12 +651,11 @@ namespace TrueSync.Physics3D {
                         break;
                     case 3:
                         //closest point origin from triangle
-                        p = TSVector.zero;
                         a = _simplexVectorW[0];
                         b = _simplexVectorW[1];
                         c = _simplexVectorW[2];
 
-                        ClosestPtPointTriangle(p, a, b, c, ref _cachedBC);
+                        ClosestPtPointTriangle(a, b, c, ref _cachedBC);
                         _cachedPA = _simplexPointsP[0] * _cachedBC.barycentricCoords[0] +
                                         _simplexPointsP[1] * _cachedBC.barycentricCoords[1] +
                                         _simplexPointsP[2] * _cachedBC.barycentricCoords[2];
@@ -671,13 +670,12 @@ namespace TrueSync.Physics3D {
                         _cachedValidClosest = _cachedBC.IsValid;
                         break;
                     case 4:
-                        p = TSVector.zero;
                         a = _simplexVectorW[0];
                         b = _simplexVectorW[1];
                         c = _simplexVectorW[2];
                         d = _simplexVectorW[3];
 
-                        bool hasSeparation = ClosestPtPointTetrahedron(p, a, b, c, d, ref _cachedBC);
+                        bool hasSeparation = ClosestPtPointTetrahedron(a, b, c, d, ref _cachedBC);
 
                         if (hasSeparation)
                         {
@@ -722,7 +720,7 @@ namespace TrueSync.Physics3D {
             return _cachedValidClosest;
         }
 
-        public bool ClosestPtPointTriangle(TSVector p, TSVector a, TSVector b, TSVector c,
+        public bool ClosestPtPointTriangle(TSVector a, TSVector b, TSVector c,
             ref SubSimplexClosestResult result)
         {
             result.usedVertices.Reset();
@@ -732,10 +730,9 @@ namespace TrueSync.Physics3D {
             // Check if P in vertex region outside A
             TSVector ab = b - a;
             TSVector ac = c - a;
-            TSVector ap = p - a;
-            FP d1 = TSVector.Dot(ab, ap);
-            FP d2 = TSVector.Dot(ac, ap);
-            if (d1 <= FP.Zero && d2 <= FP.Zero)
+            FP d1 = TSVector.Dot(ab, a);
+            FP d2 = TSVector.Dot(ac, a);
+            if (d1 >= FP.Zero && d2 >= FP.Zero)
             {
                 result.closestPointOnSimplex = a;
                 result.usedVertices.UsedVertexA = true;
@@ -744,10 +741,9 @@ namespace TrueSync.Physics3D {
             }
 
             // Check if P in vertex region outside B
-            TSVector bp = p - b;
-            FP d3 = TSVector.Dot(ab, bp);
-            FP d4 = TSVector.Dot(ac, bp);
-            if (d3 >= FP.Zero && d4 <= d3)
+            FP d3 = TSVector.Dot(ab, b);
+            FP d4 = TSVector.Dot(ac, b);
+            if (d3 <= FP.Zero && d4 >= d3)
             {
                 result.closestPointOnSimplex = b;
                 result.usedVertices.UsedVertexB = true;
@@ -769,10 +765,9 @@ namespace TrueSync.Physics3D {
             }
 
             // Check if P in vertex region outside C
-            TSVector cp = p - c;
-            FP d5 = TSVector.Dot(ab, cp);
-            FP d6 = TSVector.Dot(ac, cp);
-            if (d6 >= FP.Zero && d5 <= d6)
+            FP d5 = TSVector.Dot(ab, c);
+            FP d6 = TSVector.Dot(ac, c);
+            if (d6 <= FP.Zero && d5 >= d6)
             {
                 result.closestPointOnSimplex = c;
                 result.usedVertices.UsedVertexC = true;
@@ -823,11 +818,10 @@ namespace TrueSync.Physics3D {
         }
 
         /// Test if point p and d lie on opposite sides of plane through abc
-        public int PointOutsideOfPlane(TSVector p, TSVector a, TSVector b, TSVector c, TSVector d)
+        public int PointOutsideOfPlane(TSVector a, TSVector b, TSVector c, TSVector d)
         {
             TSVector normal = TSVector.Cross(b - a, c - a);
 
-            FP signp = TSVector.Dot(p - a, normal); // [AP AB AC]
             FP signd = TSVector.Dot(d - a, normal); // [AD AB AC]
 
             //if (CatchDegenerateTetrahedron)
@@ -835,25 +829,26 @@ namespace TrueSync.Physics3D {
                 return -1;
 
             // Points on opposite sides if expression signs are opposite
+            FP signp = -TSVector.Dot(a, normal); // [AP AB AC]
             return signp * signd < FP.Zero ? 1 : 0;
         }
 
-        public bool ClosestPtPointTetrahedron(TSVector p, TSVector a, TSVector b, TSVector c, TSVector d,
+        public bool ClosestPtPointTetrahedron(TSVector a, TSVector b, TSVector c, TSVector d,
             ref SubSimplexClosestResult finalResult) {
             tempResult.Reset();
 
             // Start out assuming point inside all halfspaces, so closest to itself
-            finalResult.closestPointOnSimplex = p;
+            finalResult.closestPointOnSimplex = TSVector.zero;
             finalResult.usedVertices.Reset();
             finalResult.usedVertices.UsedVertexA = true;
             finalResult.usedVertices.UsedVertexB = true;
             finalResult.usedVertices.UsedVertexC = true;
             finalResult.usedVertices.UsedVertexD = true;
 
-            int pointOutsideABC = PointOutsideOfPlane(p, a, b, c, d);
-            int pointOutsideACD = PointOutsideOfPlane(p, a, c, d, b);
-            int pointOutsideADB = PointOutsideOfPlane(p, a, d, b, c);
-            int pointOutsideBDC = PointOutsideOfPlane(p, b, d, c, a);
+            int pointOutsideABC = PointOutsideOfPlane(a, b, c, d);
+            int pointOutsideACD = PointOutsideOfPlane(a, c, d, b);
+            int pointOutsideADB = PointOutsideOfPlane(a, d, b, c);
+            int pointOutsideBDC = PointOutsideOfPlane(b, d, c, a);
 
             if (pointOutsideABC < 0 || pointOutsideACD < 0 || pointOutsideADB < 0 || pointOutsideBDC < 0)
             {
@@ -868,10 +863,10 @@ namespace TrueSync.Physics3D {
             // If point outside face abc then compute closest point on abc
             if (pointOutsideABC != 0)
             {
-                ClosestPtPointTriangle(p, a, b, c, ref tempResult);
+                ClosestPtPointTriangle(a, b, c, ref tempResult);
                 TSVector q = tempResult.closestPointOnSimplex;
 
-                FP sqDist = (q - p).sqrMagnitude;
+                FP sqDist = q.sqrMagnitude;
                 // Update best closest point if (squared) distance is less than current best
                 if (sqDist < bestSqDist)
                 {
@@ -893,11 +888,11 @@ namespace TrueSync.Physics3D {
             // Repeat test for face acd
             if (pointOutsideACD != 0)
             {
-                ClosestPtPointTriangle(p, a, c, d, ref tempResult);
+                ClosestPtPointTriangle(a, c, d, ref tempResult);
                 TSVector q = tempResult.closestPointOnSimplex;
                 //convert result bitmask!
 
-                FP sqDist = (q - p).sqrMagnitude;
+                FP sqDist = q.sqrMagnitude;
                 if (sqDist < bestSqDist)
                 {
                     bestSqDist = sqDist;
@@ -917,11 +912,11 @@ namespace TrueSync.Physics3D {
 
             if (pointOutsideADB != 0)
             {
-                ClosestPtPointTriangle(p, a, d, b, ref tempResult);
+                ClosestPtPointTriangle(a, d, b, ref tempResult);
                 TSVector q = tempResult.closestPointOnSimplex;
                 //convert result bitmask!
 
-                FP sqDist = (q - p).sqrMagnitude;
+                FP sqDist = q.sqrMagnitude;
                 if (sqDist < bestSqDist)
                 {
                     bestSqDist = sqDist;
@@ -942,10 +937,10 @@ namespace TrueSync.Physics3D {
 
             if (pointOutsideBDC != 0)
             {
-                ClosestPtPointTriangle(p, b, d, c, ref tempResult);
+                ClosestPtPointTriangle(b, d, c, ref tempResult);
                 TSVector q = tempResult.closestPointOnSimplex;
                 //convert result bitmask!
-                FP sqDist = (q - p).sqrMagnitude;
+                FP sqDist = q.sqrMagnitude;
                 if (sqDist < bestSqDist)
                 {
                     bestSqDist = sqDist;
