@@ -45,19 +45,20 @@ namespace TrueSync {
             get {
                 if (tsCollider != null && tsCollider.Body != null) {
                     _isPositionDirty = true;
+                    _isLocalToWorldMatrixDirty = true;
                     position = tsCollider.Body.TSPosition - scaledCenter;
                 }
 
                 return _position;
             }
             set {
-
                 if (_position.x == value.x && _position.y == value.y && _position.z == value.z)
                 {
                     _isPositionDirty = false;
                     return;
                 }
 
+                _isLocalToWorldMatrixDirty = true;
                 _position = value;
 
                 if (tsCollider != null && tsCollider.Body != null && !_isPositionDirty) {
@@ -103,6 +104,7 @@ namespace TrueSync {
             get {
                 if (tsCollider != null && tsCollider.Body != null) {
                     _isRotationDirty = true;
+                    _isLocalToWorldMatrixDirty = true;
                     rotation = TSQuaternion.CreateFromMatrix(tsCollider.Body.TSOrientation);
                 }
 
@@ -116,6 +118,7 @@ namespace TrueSync {
                     return;
                 }
 
+                _isLocalToWorldMatrixDirty = true;
                 _rotation = value;
 
                 if (tsCollider != null && tsCollider.Body != null && !_isRotationDirty) {
@@ -375,27 +378,36 @@ namespace TrueSync {
             }
         }
 
+        private bool _isLocalToWorldMatrixDirty = true;
+        private TSMatrix4x4 _localToWorldMatrix;
         public TSMatrix4x4 localToWorldMatrix
         {
             get
             {
-                TSTransform thisTransform = this;
-                TSMatrix4x4 curMatrix = TSMatrix4x4.TransformToMatrix(ref thisTransform);
-                TSTransform parent = tsParent;
-                while (parent != null)
+                if (_isLocalToWorldMatrixDirty)
                 {
-                    curMatrix = TSMatrix4x4.TransformToMatrix(ref parent) * curMatrix;
-                    parent = parent.tsParent;
+                    TSTransform thisTransform = this;
+                    _localToWorldMatrix = TSMatrix4x4.TransformToMatrix(ref thisTransform);
+                    TSTransform parent = tsParent;
+                    while (parent != null)
+                    {
+                        _localToWorldMatrix = TSMatrix4x4.TransformToMatrix(ref parent) * _localToWorldMatrix;
+                        parent = parent.tsParent;
+                    }
+                    _isLocalToWorldMatrixDirty = false;
                 }
-                return curMatrix;
+                return _localToWorldMatrix;
             }
         }
 
+        private TSMatrix4x4 _worldToLocalMatrix;
         public TSMatrix4x4 worldToLocalMatrix
         {
             get
             {
-                return TSMatrix4x4.Inverse(localToWorldMatrix);
+                if (_isLocalToWorldMatrixDirty)
+                    _worldToLocalMatrix = TSMatrix4x4.Inverse(localToWorldMatrix);
+                return _worldToLocalMatrix;
             }
         }
 
