@@ -361,7 +361,7 @@ namespace TrueSync.Physics3D {
         {
             TSVector.Add(ref this.force, ref force, out this.force);
             TSVector.Subtract(ref pos, ref this.position, out pos);
-            TSVector.Cross(ref force, ref pos, out pos);
+            TSVector.Cross(ref pos, ref force, out pos);
             TSVector.Add(ref pos, ref this.torque, out this.torque);
         }
 
