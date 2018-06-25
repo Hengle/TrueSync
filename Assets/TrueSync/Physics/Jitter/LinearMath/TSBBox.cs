@@ -134,17 +134,41 @@ namespace TrueSync
         private bool Intersect1D(FP start, FP dir, FP min, FP max,
             ref FP enter,ref FP exit)
         {
-            if (dir * dir < TSMath.Epsilon * TSMath.Epsilon) return (start >= min && start <= max);
+            FP o = start;
+            FP e = start + dir;
+            FP tmpfp;
+            if (o > e)
+            {
+                tmpfp = o;
+                o = e;
+                e = tmpfp;
+            }
+
+            //if (!(max >= o && e >= min))
+            //    return false;
+            if (o >= max || e <= min)
+                return false;
+
+            if (dir * dir < TSMath.Epsilon * TSMath.Epsilon)
+                return (start >= min && start <= max);
 
             FP t0 = (min - start) / dir;
             FP t1 = (max - start) / dir;
 
-            if (t0 > t1) { FP tmp = t0; t0 = t1; t1 = tmp; }
+            if (t0 > t1)
+            {
+                FP tmp = t0;
+                t0 = t1;
+                t1 = tmp;
+            }
 
-            if (t0 > exit || t1 < enter) return false;
+            if (t0 > exit || t1 < enter)
+                return false;
 
-            if (t0 > enter) enter = t0;
-            if (t1 < exit) exit = t1;
+            if (t0 > enter)
+                enter = t0;
+            if (t1 < exit)
+                exit = t1;
             return true;
         }
 
