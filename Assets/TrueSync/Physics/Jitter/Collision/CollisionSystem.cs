@@ -759,7 +759,84 @@ namespace TrueSync.Physics3D {
         /// against rays (rays are of infinite length). They are checked against segments
         /// which start at rayOrigin and end in rayOrigin + rayDirection.
         /// </summary>
-        public abstract bool Raycast(RigidBody body, TSVector rayOrigin, TSVector rayDirection, out TSVector normal, out FP fraction);
+        public virtual bool Raycast(RigidBody body, TSVector rayOrigin, TSVector rayDirection, out TSVector normal, out FP fraction)
+        {
+            fraction = FP.MaxValue;
+            normal = TSVector.zero;
+
+            if (!body.BoundingBox.RayIntersect(ref rayOrigin, ref rayDirection)) return false;
+
+            if (body.Shape is Multishape)
+            {
+                Multishape ms = (body.Shape as Multishape).RequestWorkingClone();
+
+                TSVector tempNormal; FP tempFraction;
+                bool multiShapeCollides = false;
+
+                TSVector transformedOrigin; TSVector.Subtract(ref rayOrigin, ref body.position, out transformedOrigin);
+                TSVector.Transform(ref transformedOrigin, ref body.invOrientation, out transformedOrigin);
+                TSVector transformedDirection; TSVector.Transform(ref rayDirection, ref body.invOrientation, out transformedDirection);
+
+                int msLength = ms.Prepare(ref transformedOrigin, ref transformedDirection);
+
+                for (int i = 0; i < msLength; i++)
+                {
+                    ms.SetCurrentShape(i);
+
+                    if (ms is TriangleMeshShape)
+                    {
+                        if (RayIntersectsTriangle(ms, ref body.orientation, ref body.invOrientation, ref body.position,
+                        ref transformedOrigin, ref transformedDirection, out tempFraction, out tempNormal))
+                        {
+                            if (tempFraction < fraction)
+                            {
+                                if (useTriangleMeshNormal)
+                                {
+                                    (ms as TriangleMeshShape).CollisionNormal(out tempNormal);
+                                    TSVector.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                    tempNormal.Negate();
+                                }
+
+                                normal = tempNormal;
+                                fraction = tempFraction;
+                                multiShapeCollides = true;
+                            }
+                        }
+                    }
+                    else if (GJKCollide.Raycast(ms, ref body.orientation, ref body.invOrientation, ref body.position,
+                        ref rayOrigin, ref rayDirection, out tempFraction, out tempNormal))
+                    {
+                        if (tempFraction < fraction)
+                        {
+                            if (useTerrainNormal && ms is TerrainShape)
+                            {
+                                (ms as TerrainShape).CollisionNormal(out tempNormal);
+                                TSVector.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                tempNormal.Negate();
+                            }
+                            else if (useTriangleMeshNormal && ms is TriangleMeshShape)
+                            {
+                                (ms as TriangleMeshShape).CollisionNormal(out tempNormal);
+                                TSVector.Transform(ref tempNormal, ref body.orientation, out tempNormal);
+                                tempNormal.Negate();
+                            }
+
+                            normal = tempNormal;
+                            fraction = tempFraction;
+                            multiShapeCollides = true;
+                        }
+                    }
+                }
+
+                ms.ReturnWorkingClone();
+                return multiShapeCollides;
+            }
+            else
+            {
+                return (GJKCollide.Raycast(body.Shape, ref body.orientation, ref body.invOrientation, ref body.position,
+                    ref rayOrigin, ref rayDirection, out fraction, out normal));
+            }
+        }
 
 
         /// <summary>
@@ -838,5 +915,169 @@ namespace TrueSync.Physics3D {
         /// and <see cref="CollisionDetected"/> events to get the results.
         /// </summary>
         public abstract void Detect();
+
+        //https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+        private bool RayIntersectsTriangle(ISupportMappable support, ref TSMatrix orientation, ref TSMatrix invOrientation,
+            ref TSVector position, ref TSVector origin, ref TSVector direction, out FP fraction, out TSVector normal)
+        {
+            FP EPSILON = FP.EN8;
+            fraction = FP.Zero;
+            normal = TSVector.zero;
+
+            TriangleMeshShape inTriangle = support as TriangleMeshShape;
+            TSVector[] vertices = inTriangle.Vertices;
+
+            TSVector vertex0 = vertices[0];
+            TSVector vertex1 = vertices[1];
+            TSVector vertex2 = vertices[2];
+
+            TSVector edge1, edge2, h, s, q;
+            FP a, f, u, v;
+            edge1 = inTriangle.edge1;
+            edge2 = inTriangle.edge2;
+            h = TSVector.Cross(direction, edge2);
+            a = TSVector.Dot(edge1, h);
+            if (a > -EPSILON && a < EPSILON)
+                return false;
+            f = 1 / a;
+            s = origin - vertex0;
+            u = f * (TSVector.Dot(s, h));
+            if (u < FP.Zero || u > FP.One)
+                return false;
+            q = TSVector.Cross(s, edge1);
+            v = f * TSVector.Dot(direction, q);
+            if (v < FP.Zero || u + v > FP.One)
+                return false;
+            // At this stage we can compute t to find out where the intersection point is on the line.
+            fraction = f * TSVector.Dot(edge2, q);
+            if (fraction > EPSILON) // ray intersection
+            {
+                return true;
+            }
+            else // This means that there is a line intersection but not a ray intersection.
+                return false;
+        }
+
+        //private bool RayIntersectsTriangle1(ISupportMappable support, ref TSMatrix orientation, ref TSMatrix invOrientation,
+        //    ref TSVector position, ref TSVector origin, ref TSVector direction, out FP fraction, out TSVector normal)
+        //{
+        //    fraction = FP.Zero;
+        //    normal = TSVector.zero;
+
+        //    TriangleMeshShape inTriangle = support as TriangleMeshShape;
+        //    TSVector[] vertices = inTriangle.Vertices;
+        //    TSVector.Transform(ref vertices[0], ref orientation, out vertices[0]);
+        //    TSVector.Add(ref position, ref vertices[0], out vertices[0]);
+        //    TSVector.Transform(ref vertices[1], ref orientation, out vertices[1]);
+        //    TSVector.Add(ref position, ref vertices[1], out vertices[1]);
+        //    TSVector.Transform(ref vertices[2], ref orientation, out vertices[2]);
+        //    TSVector.Add(ref position, ref vertices[2], out vertices[2]);
+
+        //    TSVector vertex0 = vertices[0];
+        //    TSVector vertex1 = vertices[1];
+        //    TSVector vertex2 = vertices[2];
+
+        //    TSVector u = vertex1 - vertex0;
+        //    TSVector v = vertex2 - vertex0;
+        //    TSVector n = TSVector.Cross(u, v);
+
+        //    if (n.IsNearlyZero())
+        //        return false;
+
+        //    TSVector w0 = origin - vertex0;
+        //    FP a = -TSVector.Dot(n, w0);
+        //    FP b = TSVector.Dot(n, direction);
+        //    if (TSMath.Abs(b) < TSMath.Epsilon)
+        //    {
+        //        if (a == FP.Zero)
+        //            return false; //TODO:
+        //        else
+        //            return false;
+        //    }
+
+        //    fraction = a / b;
+        //    if (fraction < FP.Zero)
+        //        return false;
+
+        //    if (fraction > FP.One)
+        //        return false;
+
+        //    TSVector I = origin + direction * fraction;
+        //    FP uu, uv, vv, wu, wv, D;
+        //    uu = TSVector.Dot(u, u);
+        //    uv = TSVector.Dot(u, v);
+        //    vv = TSVector.Dot(v, v);
+        //    TSVector w = I - vertex0;
+        //    wu = TSVector.Dot(w, u);
+        //    wv = TSVector.Dot(w, v);
+        //    D = uv * uv - uu * vv;
+
+        //    FP s, t;
+        //    s = (uv * wv - vv * wu) / D;
+        //    if (s < FP.Zero || s > FP.One)
+        //        return false;
+
+        //    t = (uv * wu - uu * wv) / D;
+        //    if (t < FP.Zero || t > FP.One)
+        //        return false;
+
+        //    normal = n.normalized;
+        //    return true;
+        //}
+
+        //private bool RayIntersectsTriangle2(ISupportMappable support, ref TSMatrix orientation, ref TSMatrix invOrientation,
+        //        ref TSVector position, ref TSVector origin, ref TSVector direction, out FP fraction, out TSVector normal)
+        //{
+        //    fraction = FP.Zero;
+        //    normal = TSVector.zero;
+
+        //    TriangleMeshShape inTriangle = support as TriangleMeshShape;
+        //    TSVector[] vertices = inTriangle.Vertices;
+
+        //    TSVector vertex0 = vertices[0];
+        //    TSVector vertex1 = vertices[1];
+        //    TSVector vertex2 = vertices[2];
+
+        //    TSVector e1 = inTriangle.edge1;
+        //    TSVector e2 = inTriangle.edge2;
+        //    TSVector n0;
+        //    inTriangle.CollisionNormal(out n0);
+        //    FP d0 = TSVector.Dot(n0, vertex0);
+
+        //    FP invDenom = FP.One / TSVector.Dot(n0, n0);
+        //    TSVector n1 = TSVector.Multiply(TSVector.Cross(e2, n0), invDenom);
+        //    FP d1 = -TSVector.Dot(n1, vertex0);
+
+        //    TSVector n2 = TSVector.Multiply(TSVector.Cross(n0, e1), invDenom);
+        //    FP d2 = -TSVector.Dot(n2, vertex0);
+
+        //    FP det = TSVector.Dot(n0, direction);
+        //    FP dett = d0 - TSVector.Dot(origin, n0);
+
+        //    TSVector wr = TSVector.Add(TSVector.Multiply(origin, det), TSVector.Multiply(direction, dett));
+        //    FP uvx = TSVector.Dot(wr, n1) + det * d1;
+        //    FP uvy = TSVector.Dot(wr, n2) + det * d2;
+
+        //    FP tmpdet0 = det - uvx - uvy;
+        //    int pdet0 = tmpdet0.AsInt();
+        //    int pdetu = uvx.AsInt();
+        //    int pdetv = uvy.AsInt();
+
+        //    pdet0 = pdet0 ^ pdetu;
+        //    pdet0 = pdet0 | (pdetu ^ pdetv);
+        //    if ((pdet0 & 0x80000000) != 0)
+        //        return false;
+
+        //    FP rdet = FP.One / det;
+        //    uvx *= rdet;
+        //    uvy *= rdet;
+        //    fraction = dett * rdet;
+        //    if (fraction > FP.Zero && fraction < FP.One)
+        //    {
+        //        normal = n0.normalized;
+        //        return true;
+        //    }
+        //    return false;
+        //}
     }
 }

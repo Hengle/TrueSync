@@ -134,6 +134,9 @@ namespace TrueSync.Physics3D {
         TSVector[] vecs = new TSVector[3];
         public TSVector[] Vertices { get { return vecs; } }
 
+        public TSVector edge1 = TSVector.zero;
+        public TSVector edge2 = TSVector.zero;
+
         /// <summary>
         /// SupportMapping. Finds the point in the shape furthest away from the given direction.
         /// Imagine a plane with a normal in the search direction. Now move the plane along the normal
@@ -205,9 +208,9 @@ namespace TrueSync.Physics3D {
       
             geomCen = sum;
 
-            TSVector.Subtract(ref vecs[1], ref vecs[0], out sum);
-            TSVector.Subtract(ref vecs[2], ref vecs[0], out normal);
-            TSVector.Cross(ref sum, ref normal, out normal);
+            TSVector.Subtract(ref vecs[1], ref vecs[0], out edge1);
+            TSVector.Subtract(ref vecs[2], ref vecs[0], out edge2);
+            TSVector.Cross(ref edge1, ref edge2, out normal);
             normal.Normalize();
             if (flipNormal) normal.Negate();
         }
