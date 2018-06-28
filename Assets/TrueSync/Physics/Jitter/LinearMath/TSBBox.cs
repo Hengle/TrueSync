@@ -131,78 +131,39 @@ namespace TrueSync
         /// <returns>The ContainmentType of the point.</returns>
         #region public Ray/Segment Intersection
 
-        private bool Intersect1D(FP start, FP dir, FP min, FP max,
-            ref FP enter,ref FP exit)
+        private bool Intersect1D(FP start, FP dir, FP min, FP max)
         {
             FP o = start;
             FP e = start + dir;
-            FP tmpfp;
+            FP tmp;
             if (o > e)
             {
-                tmpfp = o;
+                tmp = o;
                 o = e;
-                e = tmpfp;
+                e = tmp;
             }
 
-            //if (!(max >= o && e >= min))
-            //    return false;
             if (o >= max || e <= min)
                 return false;
 
-            if (dir * dir < TSMath.Epsilon * TSMath.Epsilon)
-                return (start >= min && start <= max);
+            //if (dir * dir < TSMath.Epsilon * TSMath.Epsilon)
+            //    return (start >= min && start <= max);
 
-            FP t0 = (min - start) / dir;
-            FP t1 = (max - start) / dir;
-
-            if (t0 > t1)
-            {
-                FP tmp = t0;
-                t0 = t1;
-                t1 = tmp;
-            }
-
-            if (t0 > exit || t1 < enter)
-                return false;
-
-            if (t0 > enter)
-                enter = t0;
-            if (t1 < exit)
-                exit = t1;
             return true;
         }
 
-
-        public bool SegmentIntersect(ref TSVector origin,ref TSVector direction)
+        public bool SegmentIntersect(ref TSVector origin, ref TSVector direction)
         {
-            FP enter = FP.Zero, exit = FP.One;
-
-            if (!Intersect1D(origin.x, direction.x, min.x, max.x,ref enter,ref exit))
-                return false;
-
-            if (!Intersect1D(origin.y, direction.y, min.y, max.y, ref enter, ref exit))
-                return false;
-
-            if (!Intersect1D(origin.z, direction.z, min.z, max.z,ref enter,ref exit))
-                return false;
-
-            return true;
+            return Intersect1D(origin.x, direction.x, min.x, max.x)
+                && Intersect1D(origin.y, direction.y, min.y, max.y)
+                && Intersect1D(origin.z, direction.z, min.z, max.z);
         }
 
         public bool RayIntersect(ref TSVector origin, ref TSVector direction)
         {
-            FP enter = FP.Zero, exit = FP.MaxValue;
-
-            if (!Intersect1D(origin.x, direction.x, min.x, max.x, ref enter, ref exit))
-                return false;
-
-            if (!Intersect1D(origin.y, direction.y, min.y, max.y, ref enter, ref exit))
-                return false;
-
-            if (!Intersect1D(origin.z, direction.z, min.z, max.z, ref enter, ref exit))
-                return false;
-
-            return true;
+            return Intersect1D(origin.x, direction.x, min.x, max.x)
+                && Intersect1D(origin.y, direction.y, min.y, max.y)
+                && Intersect1D(origin.z, direction.z, min.z, max.z);
         }
 
         public bool SegmentIntersect(TSVector origin, TSVector direction)
